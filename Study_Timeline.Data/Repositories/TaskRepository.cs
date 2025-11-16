@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Study_Timeline.Logic.Interfaces;
-using DomainTask = Study_Timeline.Logic.Domain.Task;
+using Task = Study_Timeline.Logic.Domain.Task;
 
 namespace Study_Timeline.Data.Repositories
 {
@@ -12,7 +12,7 @@ namespace Study_Timeline.Data.Repositories
 			_factory = factory;
 		}
 
-		public async Task AddAsync(DomainTask task)
+		public async System.Threading.Tasks.Task AddAsync(Task task)
 		{
 			var query = @"INSERT INTO Tasks 
                           (Title, Description, StartDateTime, EndDateTime, Deadline, ProgressPercentage, IsCompleted, StudentId, CategoryId)
@@ -36,7 +36,7 @@ namespace Study_Timeline.Data.Repositories
 			await command.ExecuteNonQueryAsync();
 		}
 
-		public async Task DeleteAsync(int id)
+		public async System.Threading.Tasks.Task DeleteAsync(int id)
 		{
 			var query = "DELETE FROM Tasks WHERE Id = @Id";
 
@@ -48,9 +48,9 @@ namespace Study_Timeline.Data.Repositories
 			await command.ExecuteNonQueryAsync();
 		}
 
-		public async Task<List<DomainTask>> GetAllAsync()
+		public async Task<List<Task>> GetAllAsync()
 		{
-			var tasks = new List<DomainTask>();
+			var tasks = new List<Task>();
 
 			using var connection = _factory.CreateConnection();
 			using var command = new SqlCommand("SELECT * FROM Tasks", connection);
@@ -59,7 +59,7 @@ namespace Study_Timeline.Data.Repositories
 
 			while (await reader.ReadAsync())
 			{
-				tasks.Add(new DomainTask
+				tasks.Add(new Task
 				{
 					Id = (int)reader["Id"],
 					Title = reader["Title"].ToString()!,
@@ -77,7 +77,7 @@ namespace Study_Timeline.Data.Repositories
 			return tasks;
 		}
 
-		public async Task<DomainTask?> GetByIdAsync(int id)
+		public async Task<Task?> GetByIdAsync(int id)
 		{
 			using var connection = _factory.CreateConnection();
 			using var command = new SqlCommand("SELECT * FROM Tasks WHERE Id = @Id", connection);
@@ -87,7 +87,7 @@ namespace Study_Timeline.Data.Repositories
 			using var reader = await command.ExecuteReaderAsync();
 			if (await reader.ReadAsync())
 			{
-				return new DomainTask
+				return new Task
 				{
 					Id = (int)reader["Id"],
 					Title = reader["Title"].ToString()!,
@@ -105,7 +105,7 @@ namespace Study_Timeline.Data.Repositories
 			return null;
 		}
 
-		public async Task UpdateAsync(DomainTask task)
+		public async System.Threading.Tasks.Task UpdateAsync(Task task)
 		{
 			using var connection = _factory.CreateConnection();
 
