@@ -1,8 +1,5 @@
-﻿using System.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using Study_Timeline.Logic.Interfaces;
+﻿using Study_Timeline.Logic.Interfaces;
 using Task = Study_Timeline.Logic.Domain.Task;
-
 
 namespace Study_Timeline.Data.Repositories
 {
