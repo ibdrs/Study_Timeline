@@ -11,6 +11,6 @@ namespace Study_Timeline.Logic.Domain
 		public Student Student { get; set; }
 
 
-		public List<Task> Tasks { get; set; } = new()
+		public List<Task> Tasks { get; set; } = new();
 	}
 }
