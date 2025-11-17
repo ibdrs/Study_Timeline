@@ -4,10 +4,10 @@ namespace Study_Timeline.Logic.Interfaces
 {
 	public interface ITaskRepository
 	{
-		Task<List<Task>> GetAllAsync();
-		Task<Task?> GetByIdAsync(int id);
-		System.Threading.Tasks.Task AddAsync(Task task);
-		System.Threading.Tasks.Task UpdateAsync(Task task);
-		System.Threading.Tasks.Task DeleteAsync(int id);
+		List<Task> GetAll();
+		Task? GetById(int id);
+		void Add(Task task);
+		void Update(Task task);
+		void Delete(int id);
 	}
 }

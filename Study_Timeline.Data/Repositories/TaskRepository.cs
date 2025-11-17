@@ -7,12 +7,13 @@ namespace Study_Timeline.Data.Repositories
 	public class TaskRepository : ITaskRepository
 	{
 		private readonly DbConnectionFactory _factory;
+
 		public TaskRepository(DbConnectionFactory factory)
 		{
 			_factory = factory;
 		}
 
-		public async System.Threading.Tasks.Task AddAsync(Task task)
+		public void Add(Task task)
 		{
 			var query = @"INSERT INTO Tasks 
                           (Title, Description, StartDateTime, EndDateTime, Deadline, ProgressPercentage, IsCompleted, StudentId, CategoryId)
@@ -32,11 +33,11 @@ namespace Study_Timeline.Data.Repositories
 			command.Parameters.AddWithValue("@StudentId", task.StudentId);
 			command.Parameters.AddWithValue("@CategoryId", (object?)task.CategoryId ?? DBNull.Value);
 
-			await connection.OpenAsync();
-			await command.ExecuteNonQueryAsync();
+			connection.Open();
+			command.ExecuteNonQuery();
 		}
 
-		public async System.Threading.Tasks.Task DeleteAsync(int id)
+		public void Delete(int id)
 		{
 			var query = "DELETE FROM Tasks WHERE Id = @Id";
 
@@ -44,20 +45,21 @@ namespace Study_Timeline.Data.Repositories
 			using var command = new SqlCommand(query, connection);
 			command.Parameters.AddWithValue("@Id", id);
 
-			await connection.OpenAsync();
-			await command.ExecuteNonQueryAsync();
+			connection.Open();
+			command.ExecuteNonQuery();
 		}
 
-		public async Task<List<Task>> GetAllAsync()
+		public List<Task> GetAll()
 		{
 			var tasks = new List<Task>();
 
 			using var connection = _factory.CreateConnection();
 			using var command = new SqlCommand("SELECT * FROM Tasks", connection);
-			await connection.OpenAsync();
-			using var reader = await command.ExecuteReaderAsync();
 
-			while (await reader.ReadAsync())
+			connection.Open();
+			using var reader = command.ExecuteReader();
+
+			while (reader.Read())
 			{
 				tasks.Add(new Task
 				{
@@ -77,15 +79,17 @@ namespace Study_Timeline.Data.Repositories
 			return tasks;
 		}
 
-		public async Task<Task?> GetByIdAsync(int id)
+		public Task? GetById(int id)
 		{
 			using var connection = _factory.CreateConnection();
 			using var command = new SqlCommand("SELECT * FROM Tasks WHERE Id = @Id", connection);
-			command.Parameters.AddWithValue("@Id", id);
-			await connection.OpenAsync();
 
-			using var reader = await command.ExecuteReaderAsync();
-			if (await reader.ReadAsync())
+			command.Parameters.AddWithValue("@Id", id);
+
+			connection.Open();
+			using var reader = command.ExecuteReader();
+
+			if (reader.Read())
 			{
 				return new Task
 				{
@@ -105,17 +109,17 @@ namespace Study_Timeline.Data.Repositories
 			return null;
 		}
 
-		public async System.Threading.Tasks.Task UpdateAsync(Task task)
+		public void Update(Task task)
 		{
-			using var connection = _factory.CreateConnection();
-
 			var query = @"UPDATE Tasks SET 
                             Title=@Title, Description=@Description, StartDateTime=@StartDateTime, EndDateTime=@EndDateTime, 
                             Deadline=@Deadline, ProgressPercentage=@ProgressPercentage, IsCompleted=@IsCompleted, 
                             StudentId=@StudentId, CategoryId=@CategoryId 
                           WHERE Id=@Id";
 
+			using var connection = _factory.CreateConnection();
 			using var command = new SqlCommand(query, connection);
+
 			command.Parameters.AddWithValue("@Id", task.Id);
 			command.Parameters.AddWithValue("@Title", task.Title);
 			command.Parameters.AddWithValue("@Description", task.Description);
@@ -127,8 +131,8 @@ namespace Study_Timeline.Data.Repositories
 			command.Parameters.AddWithValue("@StudentId", task.StudentId);
 			command.Parameters.AddWithValue("@CategoryId", (object?)task.CategoryId ?? DBNull.Value);
 
-			await connection.OpenAsync();
-			await command.ExecuteNonQueryAsync();
+			connection.Open();
+			command.ExecuteNonQuery();
 		}
 	}
 }

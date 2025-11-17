@@ -1,4 +1,6 @@
 ﻿using Study_Timeline.Logic.Interfaces;
+using Task = Study_Timeline.Logic.Domain.Task;
+
 
 namespace Study_Timeline.Logic.Services
 {
@@ -10,5 +12,12 @@ namespace Study_Timeline.Logic.Services
 		{
 			_repo = repo;
 		}
+
+		public List<Task> GetAllTasks()
+		{
+			return _repo.GetAll();
+		}
+
+
 	}
 }
