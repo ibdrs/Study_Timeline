@@ -1,5 +1,4 @@
 ﻿
-
 	namespace Study_Timeline.Logic.Domain
 	{
 		public class Student
