@@ -27,7 +27,7 @@
 
 			ProgressPercentage = percent;
 
-			if (percent == 100)
+			if (percent == 100 && !IsCompleted)
                 MarkCompleted();
         }
 		public void SetSchedule(DateTime start, DateTime end)

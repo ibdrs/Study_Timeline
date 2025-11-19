@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using Study_Timeline.Logic.Domain;
 using Study_Timeline.Logic.Interfaces;
 using Task = Study_Timeline.Logic.Domain.Task;
 
@@ -16,9 +17,11 @@ namespace Study_Timeline.Data.Repositories
 		public void Add(Task task)
 		{
 			var query = @"INSERT INTO Tasks 
-                          (Title, Description, StartDateTime, EndDateTime, Deadline, ProgressPercentage, IsCompleted, StudentId, CategoryId)
+                          (Title, Description, StartDateTime, EndDateTime, Deadline, 
+                           ProgressPercentage, IsCompleted, StudentId, CategoryId)
                           VALUES 
-                          (@Title, @Description, @StartDateTime, @EndDateTime, @Deadline, @ProgressPercentage, @IsCompleted, @StudentId, @CategoryId)";
+                          (@Title, @Description, @StartDateTime, @EndDateTime, @Deadline, 
+                           @ProgressPercentage, @IsCompleted, @StudentId, @CategoryId)";
 
 			using var connection = _factory.CreateConnection();
 			using var command = new SqlCommand(query, connection);
@@ -30,8 +33,9 @@ namespace Study_Timeline.Data.Repositories
 			command.Parameters.AddWithValue("@Deadline", (object?)task.Deadline ?? DBNull.Value);
 			command.Parameters.AddWithValue("@ProgressPercentage", task.ProgressPercentage);
 			command.Parameters.AddWithValue("@IsCompleted", task.IsCompleted);
-			command.Parameters.AddWithValue("@StudentId", task.StudentId);
-			command.Parameters.AddWithValue("@CategoryId", (object?)task.CategoryId ?? DBNull.Value);
+
+			command.Parameters.AddWithValue("@StudentId", task.Student.Id);
+			command.Parameters.AddWithValue("@CategoryId", (object?)task.Category?.Id ?? DBNull.Value);
 
 			connection.Open();
 			command.ExecuteNonQuery();
@@ -43,6 +47,7 @@ namespace Study_Timeline.Data.Repositories
 
 			using var connection = _factory.CreateConnection();
 			using var command = new SqlCommand(query, connection);
+
 			command.Parameters.AddWithValue("@Id", id);
 
 			connection.Open();
@@ -61,7 +66,7 @@ namespace Study_Timeline.Data.Repositories
 
 			while (reader.Read())
 			{
-				tasks.Add(new Task
+				var task = new Task
 				{
 					Id = (int)reader["Id"],
 					Title = reader["Title"].ToString()!,
@@ -70,10 +75,19 @@ namespace Study_Timeline.Data.Repositories
 					EndTime = (DateTime)reader["EndDateTime"],
 					Deadline = reader["Deadline"] as DateTime?,
 					ProgressPercentage = (int)reader["ProgressPercentage"],
-					IsCompleted = (bool)reader["IsCompleted"],
-					StudentId = (int)reader["StudentId"],
-					CategoryId = reader["CategoryId"] as int?
-				});
+					IsCompleted = (bool)reader["IsCompleted"]
+				};
+
+				task.Student = new Student
+				{
+					Id = (int)reader["StudentId"]
+				};
+
+				task.Category = reader["CategoryId"] is DBNull
+					? null
+					: new Category { Id = (int)reader["CategoryId"] };
+
+				tasks.Add(task);
 			}
 
 			return tasks;
@@ -89,24 +103,31 @@ namespace Study_Timeline.Data.Repositories
 			connection.Open();
 			using var reader = command.ExecuteReader();
 
-			if (reader.Read())
-			{
-				return new Task
-				{
-					Id = (int)reader["Id"],
-					Title = reader["Title"].ToString()!,
-					Description = reader["Description"].ToString()!,
-					StartTime = (DateTime)reader["StartDateTime"],
-					EndTime = (DateTime)reader["EndDateTime"],
-					Deadline = reader["Deadline"] as DateTime?,
-					ProgressPercentage = (int)reader["ProgressPercentage"],
-					IsCompleted = (bool)reader["IsCompleted"],
-					StudentId = (int)reader["StudentId"],
-					CategoryId = reader["CategoryId"] as int?
-				};
-			}
+			if (!reader.Read())
+				return null;
 
-			return null;
+			var task = new Task
+			{
+				Id = (int)reader["Id"],
+				Title = reader["Title"].ToString()!,
+				Description = reader["Description"].ToString()!,
+				StartTime = (DateTime)reader["StartDateTime"],
+				EndTime = (DateTime)reader["EndDateTime"],
+				Deadline = reader["Deadline"] as DateTime?,
+				ProgressPercentage = (int)reader["ProgressPercentage"],
+				IsCompleted = (bool)reader["IsCompleted"]
+			};
+
+			task.Student = new Student
+			{
+				Id = (int)reader["StudentId"]
+			};
+
+			task.Category = reader["CategoryId"] is DBNull
+				? null
+				: new Category { Id = (int)reader["CategoryId"] };
+
+			return task;
 		}
 
 		public void Update(Task task)
@@ -128,8 +149,9 @@ namespace Study_Timeline.Data.Repositories
 			command.Parameters.AddWithValue("@Deadline", (object?)task.Deadline ?? DBNull.Value);
 			command.Parameters.AddWithValue("@ProgressPercentage", task.ProgressPercentage);
 			command.Parameters.AddWithValue("@IsCompleted", task.IsCompleted);
-			command.Parameters.AddWithValue("@StudentId", task.StudentId);
-			command.Parameters.AddWithValue("@CategoryId", (object?)task.CategoryId ?? DBNull.Value);
+
+			command.Parameters.AddWithValue("@StudentId", task.Student.Id);
+			command.Parameters.AddWithValue("@CategoryId", (object?)task.Category?.Id ?? DBNull.Value);
 
 			connection.Open();
 			command.ExecuteNonQuery();
