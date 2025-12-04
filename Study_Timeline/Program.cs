@@ -6,8 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddSession();
+builder.Services.AddHttpContextAccessor();
 
 // Dependency Injection (Services)
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<TaskService>();
 
@@ -27,9 +30,26 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+app.UseSession();
 app.UseRouting();
 
+app.Use(async (context, next) =>
+{
+    // If cookie exists but session does not, restore session from cookie
+    if (context.Session.GetInt32("StudentId") == null &&
+        context.Request.Cookies.TryGetValue("StudentId", out string studentId))
+    {
+        if (int.TryParse(studentId, out int parsedId))
+        {
+            context.Session.SetInt32("StudentId", parsedId);
+        }
+    }
+
+    await next.Invoke();
+});
+
 app.UseAuthorization();
+
 
 app.MapRazorPages();
 

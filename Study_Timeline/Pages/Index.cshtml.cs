@@ -14,9 +14,13 @@ namespace Study_Timeline.Pages
             _logger = logger;
         }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
-           
+            if (HttpContext.Session.GetInt32("StudentId") == null)
+                return RedirectToPage("/Auth/Login");
+
+            return Page();
         }
+
     }
 }

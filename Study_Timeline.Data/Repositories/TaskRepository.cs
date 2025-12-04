@@ -34,7 +34,6 @@ namespace Study_Timeline.Data.Repositories
 			command.Parameters.AddWithValue("@ProgressPercentage", task.ProgressPercentage);
 			command.Parameters.AddWithValue("@IsCompleted", task.IsCompleted);
 
-			command.Parameters.AddWithValue("@StudentId", task.Student.Id);
 			command.Parameters.AddWithValue("@CategoryId", (object?)task.Category?.Id ?? DBNull.Value);
 
 			connection.Open();

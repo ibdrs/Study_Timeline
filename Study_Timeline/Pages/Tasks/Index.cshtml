@@ -1,0 +1,40 @@
+﻿@page
+@model Study_Timeline.View.Pages.Tasks.IndexModel
+
+<h1 class="mb-3">Tasks</h1>
+
+<a class="btn btn-primary mb-3" asp-page="Create">Add Task</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Progress</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Completed</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in Model.Tasks)
+        {
+            <tr>
+                <td>@t.Title</td>
+                <td>@t.ProgressPercentage%</td>
+                <td>@t.StartTime.ToString("g")</td>
+                <td>@t.EndTime.ToString("g")</td>
+                <td>@(t.IsCompleted ? "Yes" : "No")</td>
+                <td>
+                    <form method="post" asp-page-handler="delete" asp-route-id="@t.Id" class="d-inline">
+                        <button class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+
+                    <form method="post" asp-page-handler="complete" asp-route-id="@t.Id" class="d-inline">
+                        <button class="btn btn-success btn-sm" @(t.IsCompleted ? "disabled" : "")>Complete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
