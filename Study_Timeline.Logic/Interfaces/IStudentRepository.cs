@@ -4,7 +4,7 @@ namespace Study_Timeline.Logic.Interfaces
 {
     public interface IStudentRepository
     {
-        Student? GetByEmail(string email);
+        Student? GetByUser(string email);
         void Add(Student student);
         void Update(Student student);
     }

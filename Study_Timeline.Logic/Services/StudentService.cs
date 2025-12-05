@@ -12,21 +12,18 @@ namespace Study_Timeline.Logic.Services
             _repo = repo;
         }
 
-        public Student? GetStudentByEmail(string email)
+        public Student? GetStudentByUser(string user)
         {
-            if (string.IsNullOrWhiteSpace(email))
-                throw new Exception("Email cannot be empty.");
+            if (string.IsNullOrWhiteSpace(user))
+                throw new Exception("Username cannot be empty.");
 
-            return _repo.GetByEmail(email);
+            return _repo.GetByUser(user);
         }
 
         public void AddStudent(Student s)
         {
             if (string.IsNullOrWhiteSpace(s.Name))
                 throw new Exception("Name cannot be empty.");
-
-            if (string.IsNullOrWhiteSpace(s.Email))
-                throw new Exception("Email cannot be empty.");
 
             if (string.IsNullOrWhiteSpace(s.Password))
                 throw new Exception("Password cannot be empty.");

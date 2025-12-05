@@ -33,7 +33,7 @@ namespace Study_Timeline.View.Pages.Tasks
                 EndTime = Input.EndTime,
                 ProgressPercentage = 0,
                 IsCompleted = false,
-                Student = new Student { Id = 1, Name = "Admin", Email = "admin@root.nl", Password = "root" },
+                Student = new Student { Id = 1, Name = "Admin", Password = "root" },
                 Category = null
             };
 

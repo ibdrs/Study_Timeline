@@ -35,6 +35,7 @@ namespace Study_Timeline.Data.Repositories
 			command.Parameters.AddWithValue("@IsCompleted", task.IsCompleted);
 
 			command.Parameters.AddWithValue("@CategoryId", (object?)task.Category?.Id ?? DBNull.Value);
+			command.Parameters.AddWithValue("@StudentId", (object?)task.Student.Id);
 
 			connection.Open();
 			command.ExecuteNonQuery();

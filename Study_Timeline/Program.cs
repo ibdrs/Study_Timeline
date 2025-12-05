@@ -4,7 +4,6 @@ using Study_Timeline.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
@@ -13,6 +12,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<TaskService>();
+builder.Services.AddScoped<StudentService>();
 
 builder.Services.AddSingleton<DbConnectionFactory>();
 
@@ -35,7 +35,6 @@ app.UseRouting();
 
 app.Use(async (context, next) =>
 {
-    // If cookie exists but session does not, restore session from cookie
     if (context.Session.GetInt32("StudentId") == null &&
         context.Request.Cookies.TryGetValue("StudentId", out string studentId))
     {

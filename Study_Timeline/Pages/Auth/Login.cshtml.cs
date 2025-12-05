@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Study_Timeline.Logic.Services;
+using Study_Timeline.Models;
 
 namespace Study_Timeline.View.Pages.Auth
 {
@@ -14,9 +15,7 @@ namespace Study_Timeline.View.Pages.Auth
         }
 
         [BindProperty]
-        public LoginInput Input { get; set; } = new();
-
-        public string ErrorMessage { get; set; } = "";
+        public StudentLogin StudentLogin { get; set; }
 
         public void OnGet()
         {
@@ -27,11 +26,11 @@ namespace Study_Timeline.View.Pages.Auth
             if (!ModelState.IsValid)
                 return Page();
 
-            var student = _studentService.GetStudentByEmail(Input.Email);
+            var student = _studentService.GetStudentByUser(StudentLogin.UserName);
 
-            if (student == null || student.Password != Input.Password)
+            if (student == null)
             {
-                ErrorMessage = "Invalid email or password.";
+                ModelState.AddModelError(string.Empty, "User doesn't exist.");
                 return Page();
             }
 
@@ -51,13 +50,6 @@ namespace Study_Timeline.View.Pages.Auth
             );
 
             return RedirectToPage("/Index");
-        }
-
-
-        public class LoginInput
-        {
-            public string Email { get; set; } = "";
-            public string Password { get; set; } = "";
         }
     }
 }

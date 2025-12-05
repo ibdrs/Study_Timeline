@@ -1,0 +1,28 @@
+﻿@page
+@model Study_Timeline.Pages.Auth.RegisterModel
+
+<h2>Register</h2>
+
+<form method="post">
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group">
+        <label asp-for="StudentRegistration.UserName" class="control-label"></label>
+        <input asp-for="StudentRegistration.UserName" class="form-control" />
+        <span asp-validation-for="StudentRegistration.UserName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="StudentRegistration.Password" class="control-label"></label>
+        <input asp-for="StudentRegistration.Password" class="form-control" type="password" />
+        <span asp-validation-for="StudentRegistration.Password" class="text-danger"></span>
+    </div>
+
+
+    <button type="submit" class="btn btn-primary">Register</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

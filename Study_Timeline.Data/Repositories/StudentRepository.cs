@@ -13,15 +13,15 @@ namespace Study_Timeline.Data.Repositories
             _factory = factory;
         }
 
-        public Student? GetByEmail(string email)
+        public Student? GetByUser(string user)
         {
             using var connection = _factory.CreateConnection();
             using var command = new SqlCommand(
-                "SELECT Id, Name, Email, Password FROM Students WHERE Email=@Email",
+                "SELECT Id, Name, Password FROM Students WHERE Name=@Name",
                 connection
             );
 
-            command.Parameters.AddWithValue("@Email", email);
+            command.Parameters.AddWithValue("@Name", user);
 
             connection.Open();
             using var reader = command.ExecuteReader();
@@ -32,7 +32,6 @@ namespace Study_Timeline.Data.Repositories
             {
                 Id = (int)reader["Id"],
                 Name = reader["Name"].ToString()!,
-                Email = reader["Email"].ToString()!,
                 Password = reader["Password"].ToString()!,
                 Categories = new(),
                 Tasks = new()
@@ -43,13 +42,12 @@ namespace Study_Timeline.Data.Repositories
         {
             using var connection = _factory.CreateConnection();
             using var command = new SqlCommand(
-                @"INSERT INTO Students (Name, Email, Password)
-                  VALUES (@Name, @Email, @Password)",
+                @"INSERT INTO Students (Name, Password)
+                  VALUES (@Name, @Password)",
                 connection
             );
 
             command.Parameters.AddWithValue("@Name", student.Name);
-            command.Parameters.AddWithValue("@Email", student.Email);
             command.Parameters.AddWithValue("@Password", student.Password);
 
             connection.Open();
