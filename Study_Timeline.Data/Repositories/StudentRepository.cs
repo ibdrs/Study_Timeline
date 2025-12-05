@@ -33,8 +33,8 @@ namespace Study_Timeline.Data.Repositories
                 Id = (int)reader["Id"],
                 Name = reader["Name"].ToString()!,
                 Password = reader["Password"].ToString()!,
-                Categories = new(),
-                Tasks = new()
+                Categories = [],
+                Tasks = []
             };
         }
 

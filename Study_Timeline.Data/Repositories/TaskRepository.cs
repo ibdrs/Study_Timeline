@@ -79,9 +79,9 @@ namespace Study_Timeline.Data.Repositories
 				};
 
 				task.Student = new Student
-				{
-					Id = (int)reader["StudentId"]
-				};
+				(
+					id: (int)reader["StudentId"]
+				);
 
 				task.Category = reader["CategoryId"] is DBNull
 					? null

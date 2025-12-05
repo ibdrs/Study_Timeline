@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Study_Timeline.Logic.Domain;
 using Study_Timeline.Logic.Services;
+using System.ClientModel.Primitives;
 using TaskModel = Study_Timeline.Logic.Domain.Task;
 
 namespace Study_Timeline.View.Pages.Tasks
@@ -25,6 +26,13 @@ namespace Study_Timeline.View.Pages.Tasks
             if (!ModelState.IsValid)
                 return Page();
 
+            // sanity check to check if there actually is a student
+            if (HttpContext.Session.GetInt32("StudentId") == null)
+                return RedirectToPage("/Login");
+
+            // get our student id from browser session/cookies
+            var studentId = HttpContext.Session.GetInt32("StudentId");
+
             var task = new TaskModel
             {
                 Title = Input.Title,
@@ -33,7 +41,7 @@ namespace Study_Timeline.View.Pages.Tasks
                 EndTime = Input.EndTime,
                 ProgressPercentage = 0,
                 IsCompleted = false,
-                Student = new Student { Id = 1, Name = "Admin", Password = "root" },
+                Student = new Student(id: studentId.Value),
                 Category = null
             };
 
