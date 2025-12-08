@@ -26,11 +26,12 @@ namespace Study_Timeline.View.Pages.Auth
             if (!ModelState.IsValid)
                 return Page();
 
-            var student = _studentService.GetStudentByUser(StudentLogin.UserName);
+            // Lets validate the student
+            var student = _studentService.ValidateStudent(StudentLogin.UserName, StudentLogin.Password);
 
             if (student == null)
             {
-                ModelState.AddModelError(string.Empty, "User doesn't exist.");
+                ModelState.AddModelError(string.Empty, "Invalid username or password.");
                 return Page();
             }
 

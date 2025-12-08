@@ -42,8 +42,7 @@ namespace Study_Timeline.Data.Repositories
         {
             using var connection = _factory.CreateConnection();
             using var command = new SqlCommand(
-                @"INSERT INTO Students (Name, Password)
-                  VALUES (@Name, @Password)",
+                "INSERT INTO Students (Name, Password) VALUES (@Name, @Password)",
                 connection
             );
 

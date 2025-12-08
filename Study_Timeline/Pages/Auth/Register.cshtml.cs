@@ -27,10 +27,10 @@ namespace Study_Timeline.Pages.Auth
             {
                 return Page();
             }
-            Student user = new Student(StudentRegistration.UserName, StudentRegistration.Password);
-            service.AddStudent(user);
+            Student student = new Student(StudentRegistration.UserName, StudentRegistration.Password);
+            service.AddStudent(student);
 
-            TempData["Success"] = "Your account has been created successfully. You can now log in.";
+            TempData["RegisterSuccess"] = "Your account has been created successfully. You can now log in.";
             return RedirectToPage("/Auth/Login");
         }
     }

@@ -12,12 +12,12 @@ namespace Study_Timeline.Logic.Services
             _repo = repo;
         }
 
-        public Student? GetStudentByUser(string user)
+        public Student? GetStudentByUser(string username)
         {
-            if (string.IsNullOrWhiteSpace(user))
+            if (string.IsNullOrWhiteSpace(username))
                 throw new Exception("Username cannot be empty.");
 
-            return _repo.GetByUser(user);
+            return _repo.GetByUser(username);
         }
 
         public void AddStudent(Student s)
@@ -29,6 +29,25 @@ namespace Study_Timeline.Logic.Services
                 throw new Exception("Password cannot be empty.");
 
             _repo.Add(s);
+        }
+
+        // Check if the student password is correct
+        public Student? ValidateStudent(string username, string password)
+        {
+            // student object from our database
+            var student = GetStudentByUser(username);
+
+            if (student == null)
+                return null;
+
+            if (password == null)
+                return null;
+
+            if (password != student.Password)
+                return null;
+
+            // if our checks dont return null
+            return student;
         }
     }
 }
