@@ -5,24 +5,24 @@
 
 <form method="post">
     <div class="mb-3">
-        <label asp-for="Input.Title" class="form-label"></label>
-        <input asp-for="Input.Title" class="form-control" />
-        <span asp-validation-for="Input.Title" class="text-danger"></span>
+        <label asp-for="TaskInputModel.Title" class="form-label"></label>
+        <input asp-for="TaskInputModel.Title" class="form-control" />
+        <span asp-validation-for="TaskInputModel.Title" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Input.Description" class="form-label"></label>
-        <textarea asp-for="Input.Description" class="form-control"></textarea>
+        <label asp-for="TaskInputModel.Description" class="form-label"></label>
+        <textarea asp-for="TaskInputModel.Description" class="form-control"></textarea>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Input.StartTime" class="form-label"></label>
-        <input asp-for="Input.StartTime" class="form-control" type="datetime-local" />
+        <label asp-for="TaskInputModel.StartTime" class="form-label"></label>
+        <input asp-for="TaskInputModel.StartTime" class="form-control" type="datetime-local" />
     </div>
 
     <div class="mb-3">
-        <label asp-for="Input.EndTime" class="form-label"></label>
-        <input asp-for="Input.EndTime" class="form-control" type="datetime-local" />
+        <label asp-for="TaskInputModel.EndTime" class="form-label"></label>
+        <input asp-for="TaskInputModel.EndTime" class="form-control" type="datetime-local" />
     </div>
 
     <button class="btn btn-primary">Create</button>
