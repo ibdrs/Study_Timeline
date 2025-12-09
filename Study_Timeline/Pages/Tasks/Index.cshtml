@@ -33,6 +33,10 @@
                     <form method="post" asp-page-handler="complete" asp-route-id="@t.Id" class="d-inline">
                         <button class="btn btn-success btn-sm" @(t.IsCompleted ? "disabled" : "")>Complete</button>
                     </form>
+
+                    <a asp-page="Edit" asp-route-id="@t.Id" class="btn btn-primary btn-sm @(t.IsCompleted ? "disabled" : "")">
+                        Edit
+                    </a>
                 </td>
             </tr>
         }

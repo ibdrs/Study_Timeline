@@ -7,6 +7,5 @@
 		public string Description { get; set; }
 
 		public Student Student { get; set; }
-		public List<Task> Tasks { get; set; } = new();
 	}
 }

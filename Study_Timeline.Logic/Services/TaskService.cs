@@ -66,5 +66,5 @@ namespace Study_Timeline.Logic.Services
 			task.MarkCompleted();
 			_repo.Update(task);
 		}
-	}
+    }
 }

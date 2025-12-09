@@ -32,5 +32,17 @@ namespace Study_Timeline.View.Pages.Tasks
             _taskService.CompleteTask(id);
             return RedirectToPage();
         }
+        public IActionResult OnPostEdit(int id)
+        {
+            var Task = _taskService.GetTaskById(id);
+
+            if (Task == null) {
+                ModelState.AddModelError("", "Task not found.");
+                return Page();
+            }
+
+            _taskService.UpdateTask(Task);
+            return RedirectToPage("Edit");
+        }
     }
 }

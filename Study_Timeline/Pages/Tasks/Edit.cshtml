@@ -1,0 +1,62 @@
+﻿@page
+@model Study_Timeline.View.Pages.Tasks.EditModel
+
+<h2>Edit Task</h2>
+
+<form method="post">
+    <div class="mb-3">
+        <label asp-for="EditTaskInputModel.Title" class="form-label"></label>
+        <input asp-for="EditTaskInputModel.Title" class="form-control" />
+        <span asp-validation-for="EditTaskInputModel.Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="EditTaskInputModel.Description" class="form-label"></label>
+        <textarea asp-for="EditTaskInputModel.Description" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="EditTaskInputModel.StartTime" class="form-label"></label>
+        <input asp-for="EditTaskInputModel.StartTime" class="form-control" type="datetime-local" step="60"/>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="EditTaskInputModel.EndTime" class="form-label"></label>
+        <input asp-for="EditTaskInputModel.EndTime" class="form-control" type="datetime-local" step="60"/>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="EditTaskInputModel.ProgressPercentage" class="form-label">Progress (%)</label>
+
+        <span id="progressValue" class="fw-bold d-block mb-1" style="font-size: 1.1rem">
+            @Model.EditTaskInputModel.ProgressPercentage%
+        </span>
+
+        <div class="d-flex align-items-center gap-2">
+            <input id="progressSlider"
+                   asp-for="EditTaskInputModel.ProgressPercentage"
+                   type="range"
+                   class="form-range"
+                   min="0"
+                   max="100"
+                   step="1" />
+        </div>
+    </div>
+
+    <button class="btn btn-primary">Edit</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <script>
+        const slider = document.getElementById("progressSlider");
+        const label = document.getElementById("progressValue");
+
+        slider.addEventListener("input", function () {
+            label.textContent = slider.value + "%";
+        });
+    </script>
+
+    <partial name="_ValidationScriptsPartial" />
+}
+

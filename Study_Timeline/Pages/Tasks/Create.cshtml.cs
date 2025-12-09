@@ -12,7 +12,7 @@ namespace Study_Timeline.View.Pages.Tasks
         private readonly TaskService _taskService;
 
         [BindProperty]
-        public TaskInputModel TaskInputModel { get; set; } = new();
+        public CreateTaskInputModel CreateTaskInputModel { get; set; } = new();
 
         public CreateModel(TaskService taskService)
         {
@@ -34,10 +34,10 @@ namespace Study_Timeline.View.Pages.Tasks
 
             var task = new TaskModel
             {
-                Title = TaskInputModel.Title,
-                Description = TaskInputModel.Description,
-                StartTime = TaskInputModel.StartTime,
-                EndTime = TaskInputModel.EndTime,
+                Title = CreateTaskInputModel.Title,
+                Description = CreateTaskInputModel.Description,
+                StartTime = CreateTaskInputModel.StartTime,
+                EndTime = CreateTaskInputModel.EndTime,
                 ProgressPercentage = 0,
                 IsCompleted = false,
                 Student = new Student(id: studentId.Value),
