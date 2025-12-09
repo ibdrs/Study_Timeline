@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Study_Timeline.Logic.Domain;
 using Study_Timeline.Logic.Services;
-using System.ClientModel.Primitives;
+using Study_Timeline.Models;
 using TaskModel = Study_Timeline.Logic.Domain.Task;
 
 namespace Study_Timeline.View.Pages.Tasks
@@ -12,15 +12,14 @@ namespace Study_Timeline.View.Pages.Tasks
         private readonly TaskService _taskService;
 
         [BindProperty]
-        public TaskInputModel Input { get; set; } = new();
+        public TaskInputModel TaskInputModel { get; set; } = new();
 
         public CreateModel(TaskService taskService)
         {
             _taskService = taskService;
         }
 
-        public void OnGet() { }
-
+        public void OnGet() { } 
         public IActionResult OnPost()
         {
             if (!ModelState.IsValid)
@@ -35,10 +34,10 @@ namespace Study_Timeline.View.Pages.Tasks
 
             var task = new TaskModel
             {
-                Title = Input.Title,
-                Description = Input.Description,
-                StartTime = Input.StartTime,
-                EndTime = Input.EndTime,
+                Title = TaskInputModel.Title,
+                Description = TaskInputModel.Description,
+                StartTime = TaskInputModel.StartTime,
+                EndTime = TaskInputModel.EndTime,
                 ProgressPercentage = 0,
                 IsCompleted = false,
                 Student = new Student(id: studentId.Value),
@@ -48,14 +47,6 @@ namespace Study_Timeline.View.Pages.Tasks
             _taskService.AddTask(task);
 
             return RedirectToPage("Index");
-        }
-
-        public class TaskInputModel
-        {
-            public string Title { get; set; } = string.Empty;
-            public string Description { get; set; } = string.Empty;
-            public DateTime StartTime { get; set; } = DateTime.Now;
-            public DateTime EndTime { get; set; } = DateTime.Now.AddHours(1);
         }
     }
 }
