@@ -11,7 +11,6 @@
         public int ProgressPercentage { get; set; }
 		public bool IsCompleted { get; set; }
 
-		public Student Student { get; set; }
 		public Category? Category { get; set; }
 
 		// Domain methods

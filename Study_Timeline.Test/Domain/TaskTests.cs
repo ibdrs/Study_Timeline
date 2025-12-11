@@ -5,17 +5,23 @@ namespace Study_Timeline.Test.Domain
 {
     public class TaskTests
     {
-        private Task CreateTask()
+        private Task CreateTaskForStudent()
         {
-            return new Task
+            var student = new Student(id: 1, name: "Ivan", password: "pass123");
+
+            var task = new Task
             {
                 Id = 1,
                 Title = "Study",
                 Description = "Test",
                 StartTime = DateTime.Now,
                 EndTime = DateTime.Now.AddHours(1),
-                Student = new Student(id: 1)
             };
+
+            // Add the task so it belongs to this student
+            student.AddTask(task); 
+
+            return task;
         }
 
         // happy scenario (task is completed)
@@ -23,7 +29,7 @@ namespace Study_Timeline.Test.Domain
         public void MarkCompleted_ShouldSetProgressTo100_AndIsCompletedTrue()
         {
             // Arrange
-            var task = CreateTask();
+            var task = CreateTaskForStudent();
 
             // Act
             task.MarkCompleted();
@@ -40,7 +46,7 @@ namespace Study_Timeline.Test.Domain
         public void UpdateProgress_ShouldThrow_WhenPercentageOutsideRange(int invalidValue)
         {
             // Arrange
-            var task = CreateTask();
+            var task = CreateTaskForStudent();
 
             // Act
             Action act = () => task.UpdateProgress(invalidValue);

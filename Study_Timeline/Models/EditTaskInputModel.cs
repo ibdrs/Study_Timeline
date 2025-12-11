@@ -6,6 +6,7 @@
         private DateTime _startTime = DateTime.Now;
         private DateTime _endTime = DateTime.Now.AddHours(1);
 
+        public int Id { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public DateTime StartTime

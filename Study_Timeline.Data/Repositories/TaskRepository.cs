@@ -35,8 +35,6 @@ namespace Study_Timeline.Data.Repositories
 			command.Parameters.AddWithValue("@IsCompleted", task.IsCompleted);
 
 			command.Parameters.AddWithValue("@CategoryId", (object?)task.Category?.Id ?? DBNull.Value);
-			command.Parameters.AddWithValue("@StudentId", (object?)task.Student.Id);
-
 			connection.Open();
 			command.ExecuteNonQuery();
 		}
@@ -78,10 +76,6 @@ namespace Study_Timeline.Data.Repositories
 					IsCompleted = (bool)reader["IsCompleted"]
 				};
 
-				task.Student = new Student
-				(
-					id: (int)reader["StudentId"]
-				);
 
 				task.Category = reader["CategoryId"] is DBNull
 					? null
@@ -118,11 +112,6 @@ namespace Study_Timeline.Data.Repositories
 				IsCompleted = (bool)reader["IsCompleted"]
 			};
 
-			task.Student = new Student
-			{
-				Id = (int)reader["StudentId"]
-			};
-
 			task.Category = reader["CategoryId"] is DBNull
 				? null
 				: new Category { Id = (int)reader["CategoryId"] };
@@ -150,7 +139,6 @@ namespace Study_Timeline.Data.Repositories
 			command.Parameters.AddWithValue("@ProgressPercentage", task.ProgressPercentage);
 			command.Parameters.AddWithValue("@IsCompleted", task.IsCompleted);
 
-			command.Parameters.AddWithValue("@StudentId", task.Student.Id);
 			command.Parameters.AddWithValue("@CategoryId", (object?)task.Category?.Id ?? DBNull.Value);
 
 			connection.Open();

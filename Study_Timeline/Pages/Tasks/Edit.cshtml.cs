@@ -26,6 +26,7 @@ namespace Study_Timeline.View.Pages.Tasks
 
             EditTaskInputModel = new EditTaskInputModel
             {
+                Id = task.Id,
                 Title = task.Title,
                 Description = task.Description,
                 StartTime = task.StartTime,
@@ -56,12 +57,17 @@ namespace Study_Timeline.View.Pages.Tasks
                 StartTime = EditTaskInputModel.StartTime,
                 EndTime = EditTaskInputModel.EndTime,
                 ProgressPercentage = EditTaskInputModel.ProgressPercentage,
-                Student = new Student(studentId.Value),
                 IsCompleted = false
             };
 
             _taskService.UpdateTask(task);
 
+            return RedirectToPage("Index");
+        }
+
+        public IActionResult OnPostComplete(int id)
+        {
+            _taskService.CompleteTask(id);
             return RedirectToPage("Index");
         }
     }

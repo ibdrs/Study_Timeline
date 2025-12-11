@@ -40,7 +40,6 @@ namespace Study_Timeline.View.Pages.Tasks
                 EndTime = CreateTaskInputModel.EndTime,
                 ProgressPercentage = 0,
                 IsCompleted = false,
-                Student = new Student(id: studentId.Value),
                 Category = null
             };
 
