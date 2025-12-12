@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Study_Timeline.Logic.Domain;
 using Study_Timeline.Logic.Services;
 using Study_Timeline.Models;
-using TaskModel = Study_Timeline.Logic.Domain.Task;
+using Task = Study_Timeline.Logic.Domain.Task;
 
 namespace Study_Timeline.View.Pages.Tasks
 {
@@ -29,8 +29,8 @@ namespace Study_Timeline.View.Pages.Tasks
                 Id = task.Id,
                 Title = task.Title,
                 Description = task.Description,
-                StartTime = task.StartTime,
-                EndTime = task.EndTime,
+                StartTime = task.StartTime ?? DateTime.Now,
+                EndTime = task.EndTime ?? DateTime.Now.AddHours(1),
                 ProgressPercentage = task.ProgressPercentage
             };
 
@@ -42,28 +42,25 @@ namespace Study_Timeline.View.Pages.Tasks
             if (!ModelState.IsValid)
                 return Page();
 
-            // sanity check to check if there actually is a student
-            if (HttpContext.Session.GetInt32("StudentId") == null)
-                return RedirectToPage("/Login");
+            var task = _taskService.GetTaskById(id);
+            if (task == null)
+                return NotFound();
 
-            // get our student id from browser session/cookies
-            var studentId = HttpContext.Session.GetInt32("StudentId");
+            task.UpdateDetails(
+                EditTaskInputModel.Title,
+                EditTaskInputModel.Description,
+                EditTaskInputModel.StartTime,
+                EditTaskInputModel.EndTime,
+                null
+            );
 
-            var task = new TaskModel
-            {
-                Id = id,
-                Title = EditTaskInputModel.Title,
-                Description = EditTaskInputModel.Description,
-                StartTime = EditTaskInputModel.StartTime,
-                EndTime = EditTaskInputModel.EndTime,
-                ProgressPercentage = EditTaskInputModel.ProgressPercentage,
-                IsCompleted = false
-            };
+            task.UpdateProgress(EditTaskInputModel.ProgressPercentage);
 
             _taskService.UpdateTask(task);
 
             return RedirectToPage("Index");
         }
+
 
         public IActionResult OnPostComplete(int id)
         {

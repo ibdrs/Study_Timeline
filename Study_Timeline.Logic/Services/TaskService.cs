@@ -28,10 +28,7 @@ namespace Study_Timeline.Logic.Services
 		// Add a new task
 		public void AddTask(Task task)
 		{
-			if (string.IsNullOrWhiteSpace(task.Title))
-				throw new ArgumentException("Task title cannot be empty.");
-
-			_repo.Add(task);
+            _repo.Add(task);
 		}
 
 		// Update an existing task

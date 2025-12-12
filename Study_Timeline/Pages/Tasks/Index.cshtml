@@ -22,8 +22,8 @@
             <tr>
                 <td>@t.Title</td>
                 <td>@t.ProgressPercentage%</td>
-                <td>@t.StartTime.ToString("g")</td>
-                <td>@t.EndTime.ToString("g")</td>
+                <td>@(t.StartTime?.ToString("g") ?? "-")</td>
+                <td>@(t.EndTime?.ToString("g") ?? "-")</td>
                 <td>@(t.IsCompleted ? "Yes" : "No")</td>
                 <td>
                     <form method="post" asp-page-handler="delete" asp-route-id="@t.Id" class="d-inline">

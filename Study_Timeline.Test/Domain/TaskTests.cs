@@ -10,13 +10,12 @@ namespace Study_Timeline.Test.Domain
             var student = new Student(id: 1, name: "Ivan", password: "pass123");
 
             var task = new Task
-            {
-                Id = 1,
-                Title = "Study",
-                Description = "Test",
-                StartTime = DateTime.Now,
-                EndTime = DateTime.Now.AddHours(1),
-            };
+            (
+                title: "Study",
+                description: "Test"
+            );
+
+            task.SetSchedule(DateTime.Now, DateTime.Now.AddHours(1));
 
             // Add the task so it belongs to this student
             student.AddTask(task); 
@@ -24,7 +23,6 @@ namespace Study_Timeline.Test.Domain
             return task;
         }
 
-        // happy scenario (task is completed)
         [Fact]
         public void MarkCompleted_ShouldSetProgressTo100_AndIsCompletedTrue()
         {
@@ -39,7 +37,7 @@ namespace Study_Timeline.Test.Domain
             Assert.Equal(100, task.ProgressPercentage);
         }
 
-        // unhappy scenario (out of range)
+
         [Theory]
         [InlineData(-5)]
         [InlineData(120)]
@@ -53,6 +51,25 @@ namespace Study_Timeline.Test.Domain
 
             // Assert
             Assert.Throws<ArgumentOutOfRangeException>(act);
+        }
+
+        [Fact]
+        public void Task_ShouldThrow_WhenNoScheduleOrDeadlineProvided()
+        {
+            // Arrange
+            var task = new Task("Study", "Test");
+
+            // Act
+            Action act = () => task.UpdateDetails(
+                "Study",
+                "Test",
+                startTime: null,
+                endTime: null,
+                deadline: null
+            );
+
+            // Assert
+            Assert.Throws<InvalidOperationException>(act);
         }
     }
 }

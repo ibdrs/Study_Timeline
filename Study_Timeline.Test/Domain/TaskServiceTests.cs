@@ -6,20 +6,22 @@ using Task = Study_Timeline.Logic.Domain.Task;
 
 public class TaskServiceTests
 {
-    private Task CreateTaskForStudent()
+    private Task CreateTaskForStudent(string title = "Homework")
     {
         var student = new Student(1, "Ivan", "pass123");
 
-        var task = new Task
-        {
-            Id = 1,
-            Title = "Study",
-            Description = "Test",
-            StartTime = DateTime.Now,
-            EndTime = DateTime.Now.AddHours(1)
-        };
+        // NEW TASK: no id, no schedule yet
+        var task = new Task(
+            title: title,
+            description: "Test"
+        );
 
+        // enforce invariant: task must have a schedule OR deadline
+        task.SetSchedule(DateTime.Now, DateTime.Now.AddHours(1));
+
+        // Add the task so it belongs to this student
         student.AddTask(task);
+
         return task;
     }
 
@@ -31,7 +33,7 @@ public class TaskServiceTests
         var mockRepo = new Mock<ITaskRepository>();
         var service = new TaskService(mockRepo.Object);
 
-        var task = CreateTaskForStudent();
+        var task = CreateTaskForStudent("Homework");
 
         // Act
         service.AddTask(task);
@@ -40,7 +42,7 @@ public class TaskServiceTests
         mockRepo.Verify(r => r.Add(task), Times.Once);
     }
 
-    // Test 2 — AddTask moet fout geven bij ongeldige input
+    // Test 2 — AddTask moet fout geven zonder titel
     [Fact]
     public void AddTask_Should_Throw_When_Title_Is_Empty()
     {
@@ -48,11 +50,10 @@ public class TaskServiceTests
         var mockRepo = new Mock<ITaskRepository>();
         var service = new TaskService(mockRepo.Object);
 
-        var task = CreateTaskForStudent();
-        task.Title = "";
-
-        // Act + Assert
-        Assert.Throws<ArgumentException>(() => service.AddTask(task));
+        // empty title , should throw argument exception
+        Assert.Throws<ArgumentException>(() =>
+            CreateTaskForStudent("")
+        );
     }
 
     // Test 3 — CompleteTask moet task ophalen, status wijzigen en opslaan
@@ -99,7 +100,9 @@ public class TaskServiceTests
         var service = new TaskService(mockRepo.Object);
 
         var task = CreateTaskForStudent();
-        task.IsCompleted = true;
+
+        // complete the task
+        task.MarkCompleted();
 
         mockRepo.Setup(r => r.GetById(task.Id)).Returns(task);
 

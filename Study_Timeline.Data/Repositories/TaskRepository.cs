@@ -64,17 +64,18 @@ namespace Study_Timeline.Data.Repositories
 
 			while (reader.Read())
 			{
-				var task = new Task
-				{
-					Id = (int)reader["Id"],
-					Title = reader["Title"].ToString()!,
-					Description = reader["Description"].ToString()!,
-					StartTime = (DateTime)reader["StartDateTime"],
-					EndTime = (DateTime)reader["EndDateTime"],
-					Deadline = reader["Deadline"] as DateTime?,
-					ProgressPercentage = (int)reader["ProgressPercentage"],
-					IsCompleted = (bool)reader["IsCompleted"]
-				};
+				var task = new Task	
+				(
+					id: (int)reader["Id"],
+					title: reader["Title"].ToString()!,
+					description: reader["Description"].ToString()!,
+					startTime: (DateTime)reader["StartDateTime"],
+					endTime: (DateTime)reader["EndDateTime"],
+					deadline: reader["Deadline"] as DateTime?,
+					progressPercentage: (int)reader["ProgressPercentage"],
+					isCompleted: (bool)reader["IsCompleted"],
+					category: null
+				);
 
 
 				task.Category = reader["CategoryId"] is DBNull
@@ -101,16 +102,17 @@ namespace Study_Timeline.Data.Repositories
 				return null;
 
 			var task = new Task
-			{
-				Id = (int)reader["Id"],
-				Title = reader["Title"].ToString()!,
-				Description = reader["Description"].ToString()!,
-				StartTime = (DateTime)reader["StartDateTime"],
-				EndTime = (DateTime)reader["EndDateTime"],
-				Deadline = reader["Deadline"] as DateTime?,
-				ProgressPercentage = (int)reader["ProgressPercentage"],
-				IsCompleted = (bool)reader["IsCompleted"]
-			};
+			(
+				id: (int)reader["Id"],
+				title: reader["Title"].ToString()!,
+				description: reader["Description"].ToString()!,
+				startTime: (DateTime)reader["StartDateTime"],
+				endTime: (DateTime)reader["EndDateTime"],
+				deadline: reader["Deadline"] as DateTime?,
+				progressPercentage: (int)reader["ProgressPercentage"],
+				isCompleted: (bool)reader["IsCompleted"],
+				category: null
+			);
 
 			task.Category = reader["CategoryId"] is DBNull
 				? null

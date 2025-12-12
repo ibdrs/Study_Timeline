@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Study_Timeline.Logic.Domain;
 using Study_Timeline.Logic.Services;
 using Study_Timeline.Models;
-using TaskModel = Study_Timeline.Logic.Domain.Task;
+using System.Threading.Tasks;
+using Task = Study_Timeline.Logic.Domain.Task;
 
 namespace Study_Timeline.View.Pages.Tasks
 {
@@ -32,16 +33,8 @@ namespace Study_Timeline.View.Pages.Tasks
             // get our student id from browser session/cookies
             var studentId = HttpContext.Session.GetInt32("StudentId");
 
-            var task = new TaskModel
-            {
-                Title = CreateTaskInputModel.Title,
-                Description = CreateTaskInputModel.Description,
-                StartTime = CreateTaskInputModel.StartTime,
-                EndTime = CreateTaskInputModel.EndTime,
-                ProgressPercentage = 0,
-                IsCompleted = false,
-                Category = null
-            };
+            var task = new Task(CreateTaskInputModel.Title, CreateTaskInputModel.Description);
+            task.SetSchedule(CreateTaskInputModel.StartTime, CreateTaskInputModel.EndTime);
 
             _taskService.AddTask(task);
 
