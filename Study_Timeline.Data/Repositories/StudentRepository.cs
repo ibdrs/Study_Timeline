@@ -26,15 +26,16 @@ namespace Study_Timeline.Data.Repositories
             connection.Open();
             using var reader = command.ExecuteReader();
 
-            if (!reader.Read()) return null;
+            if (!reader.Read())
+                return null;
 
-            return new Student
-            {
-                Id = (int)reader["Id"],
-                Name = reader["Name"].ToString()!,
-                Password = reader["Password"].ToString()!,
-            };
+            return new Student(
+                id: (int)reader["Id"],
+                name: reader["Name"].ToString()!,
+                password: reader["Password"].ToString()!
+            );
         }
+
 
         public void Add(Student student)
         {

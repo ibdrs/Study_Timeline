@@ -1,34 +1,46 @@
-﻿
-namespace Study_Timeline.Logic.Domain
+﻿namespace Study_Timeline.Logic.Domain
 {
-	public class Student
-	{
-		public int Id { get; set; }
-		public string Name { get; set; }
-		public string Password { get; set; }
+    public class Student
+    {
+        // Hydration constructor (repository)
+        public Student(int id, string name, string password)
+        {
+            Id = id;
+            SetName(name);
+            SetPassword(password);
+        }
+
+        // Creation constructor (new student)
+        public Student(string name, string password)
+        {
+            SetName(name);
+            SetPassword(password);
+        }
+
+        public int Id { get; private set; }
+        public string Name { get; private set; } = string.Empty;
+        public string Password { get; private set; } = string.Empty;
 
         public List<Task> Tasks { get; set; } = new();
 
-        // parameterloze constructor voor object initializers
-        public Student() { }
+        // Domain behaviour
 
-        public Student(int id)
+        private void SetName(string name)
         {
-            Id = id;
-        }
-        public Student(string name, string password) 
-		{
-			Name = name;
-			Password = password;
-		}
-        public Student(int id, string name, string password)
-        {
-			Id = id;
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Name cannot be empty.");
+
             Name = name;
+        }
+
+        private void SetPassword(string password)
+        {
+            if (string.IsNullOrWhiteSpace(password))
+                throw new ArgumentException("Password cannot be empty.");
+
             Password = password;
         }
 
-        // domain methods
         public void AddTask(Task task)
         {
             if (task == null)

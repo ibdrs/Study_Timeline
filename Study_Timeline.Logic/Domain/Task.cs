@@ -2,7 +2,7 @@
 {
     public class Task
     {
-        // Hydration constructor (repository only)
+        // Hydration constructor (repository)
         public Task(
             int id,
             string title,
