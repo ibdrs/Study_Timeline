@@ -2,12 +2,15 @@
 
 namespace Study_Timeline.Logic.Interfaces
 {
-	public interface ITaskRepository
-	{
-		List<Task> GetAll();
-		Task? GetById(int id);
-		void Add(Task task);
-		void Update(Task task);
-		void Delete(int id);
-	}
+    public interface ITaskRepository
+    {
+        void Add(Task task);
+        void Update(Task task);
+        void Delete(int id);
+
+        Task? GetById(int id);
+        List<Task> GetAll();
+        List<Task> GetByStudentId(int studentId);
+    }
+
 }

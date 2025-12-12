@@ -24,7 +24,7 @@ namespace Study_Timeline.Data.Repositories
             command.Parameters.AddWithValue("@Name", user);
 
             connection.Open();
-            using var reader = command.ExecuteReader();
+            using var reader = command.ExecuteReader(); 
 
             if (!reader.Read())
                 return null;

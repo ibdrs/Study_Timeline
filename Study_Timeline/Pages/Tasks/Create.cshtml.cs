@@ -31,12 +31,21 @@ namespace Study_Timeline.View.Pages.Tasks
                 return RedirectToPage("/Login");
 
             // get our student id from browser session/cookies
-            var studentId = HttpContext.Session.GetInt32("StudentId");
+            var studentId = HttpContext.Session.GetInt32("StudentId")!.Value;
 
-            var task = new Task(CreateTaskInputModel.Title, CreateTaskInputModel.Description);
-            task.SetSchedule(CreateTaskInputModel.StartTime, CreateTaskInputModel.EndTime);
+            var task = new Task(
+                studentId,
+                CreateTaskInputModel.Title,
+                CreateTaskInputModel.Description
+            );
+
+            task.SetSchedule(
+                CreateTaskInputModel.StartTime,
+                CreateTaskInputModel.EndTime
+            );
 
             _taskService.AddTask(task);
+
 
             return RedirectToPage("Index");
         }

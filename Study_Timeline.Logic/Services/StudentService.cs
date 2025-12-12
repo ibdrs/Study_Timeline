@@ -25,6 +25,7 @@ namespace Study_Timeline.Logic.Services
             _repo.Add(student);
         }
 
+
         public Student? ValidateStudent(string username, string password)
         {
             var student = GetStudentByUser(username);

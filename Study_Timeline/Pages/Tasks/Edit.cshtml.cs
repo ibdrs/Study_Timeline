@@ -20,9 +20,14 @@ namespace Study_Timeline.View.Pages.Tasks
         }
         public IActionResult OnGet(int id)
         {
+            var studentId = HttpContext.Session.GetInt32("StudentId");
+            if (studentId == null)
+                return RedirectToPage("/Login");
+
             var task = _taskService.GetTaskById(id);
-            if (task == null)
+            if (task == null || task.StudentId != studentId.Value)
                 return NotFound();
+
 
             EditTaskInputModel = new EditTaskInputModel
             {
@@ -42,8 +47,12 @@ namespace Study_Timeline.View.Pages.Tasks
             if (!ModelState.IsValid)
                 return Page();
 
+            var studentId = HttpContext.Session.GetInt32("StudentId");
+            if (studentId == null)
+                return RedirectToPage("/Login");
+
             var task = _taskService.GetTaskById(id);
-            if (task == null)
+            if (task == null || task.StudentId != studentId.Value)
                 return NotFound();
 
             task.UpdateDetails(
@@ -64,6 +73,14 @@ namespace Study_Timeline.View.Pages.Tasks
 
         public IActionResult OnPostComplete(int id)
         {
+            var studentId = HttpContext.Session.GetInt32("StudentId");
+            if (studentId == null)
+                return RedirectToPage("/Login");
+
+            var task = _taskService.GetTaskById(id);
+            if (task == null || task.StudentId != studentId.Value)
+                return NotFound();
+
             _taskService.CompleteTask(id);
             return RedirectToPage("Index");
         }

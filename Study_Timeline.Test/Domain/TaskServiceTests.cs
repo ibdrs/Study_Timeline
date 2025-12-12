@@ -12,6 +12,7 @@ public class TaskServiceTests
 
         // NEW TASK: no id, no schedule yet
         var task = new Task(
+            studentId: student.Id,
             title: title,
             description: "Test"
         );

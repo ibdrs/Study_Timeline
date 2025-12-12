@@ -16,10 +16,16 @@ namespace Study_Timeline.View.Pages.Tasks
             _taskService = taskService;
         }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
-            Tasks = _taskService.GetAllTasks();
+            var studentId = HttpContext.Session.GetInt32("StudentId");
+            if (studentId == null)
+                return RedirectToPage("/Login");
+
+            Tasks = _taskService.GetTasksForStudent(studentId.Value);
+            return Page();
         }
+
 
         public IActionResult OnPostDelete(int id)
         {
@@ -31,18 +37,6 @@ namespace Study_Timeline.View.Pages.Tasks
         {
             _taskService.CompleteTask(id);
             return RedirectToPage();
-        }
-        public IActionResult OnPostEdit(int id)
-        {
-            var Task = _taskService.GetTaskById(id);
-
-            if (Task == null) {
-                ModelState.AddModelError("", "Task not found.");
-                return Page();
-            }
-
-            _taskService.UpdateTask(Task);
-            return RedirectToPage("Edit");
         }
     }
 }

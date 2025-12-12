@@ -11,6 +11,7 @@ namespace Study_Timeline.Test.Domain
 
             var task = new Task
             (
+                studentId: 1,
                 title: "Study",
                 description: "Test"
             );
@@ -57,7 +58,7 @@ namespace Study_Timeline.Test.Domain
         public void Task_ShouldThrow_WhenNoScheduleOrDeadlineProvided()
         {
             // Arrange
-            var task = new Task("Study", "Test");
+            var task = new Task(1, "Study", "Test");
 
             // Act
             Action act = () => task.UpdateDetails(

@@ -25,8 +25,13 @@ namespace Study_Timeline.Logic.Services
 			return _repo.GetById(id);
 		}
 
-		// Add a new task
-		public void AddTask(Task task)
+        public List<Task> GetTasksForStudent(int studentId)
+        {
+            return _repo.GetByStudentId(studentId);
+        }
+
+        // Add a new task
+        public void AddTask(Task task)
 		{
             _repo.Add(task);
 		}
