@@ -22,19 +22,54 @@
             <tr>
                 <td>@t.Title</td>
                 <td>@t.ProgressPercentage%</td>
-                <td>@(t.StartTime?.ToString("g") ?? "-")</td>
-                <td>@(t.EndTime?.ToString("g") ?? "-")</td>
-                <td>@(t.IsCompleted ? "Yes" : "No")</td>
+
+                @* START *@
                 <td>
-                    <form method="post" asp-page-handler="delete" asp-route-id="@t.Id" class="d-inline">
+                    @if (t.Deadline != null)
+                    {
+                        @t.Deadline.Value.ToString("g")
+                    }
+                    else
+                    {
+                        @(t.StartTime?.ToString("g") ?? "-")
+                    }
+                </td>
+
+                @* END *@
+                <td>
+                    @if (t.Deadline != null)
+                    {
+                        <span>-</span>
+                    }
+                    else
+                    {
+                        @(t.EndTime?.ToString("g") ?? "-")
+                    }
+                </td>
+
+                <td>@(t.IsCompleted ? "Yes" : "No")</td>
+
+                <td>
+                    <form method="post"
+                          asp-page-handler="delete"
+                          asp-route-id="@t.Id"
+                          class="d-inline">
                         <button class="btn btn-danger btn-sm">Delete</button>
                     </form>
 
-                    <form method="post" asp-page-handler="complete" asp-route-id="@t.Id" class="d-inline">
-                        <button class="btn btn-success btn-sm" @(t.IsCompleted ? "disabled" : "")>Complete</button>
+                    <form method="post"
+                          asp-page-handler="complete"
+                          asp-route-id="@t.Id"
+                          class="d-inline">
+                        <button class="btn btn-success btn-sm"
+                        @(t.IsCompleted ? "disabled" : "")>
+                            Complete
+                        </button>
                     </form>
 
-                    <a asp-page="Edit" asp-route-id="@t.Id" class="btn btn-primary btn-sm @(t.IsCompleted ? "disabled" : "")">
+                    <a asp-page="Edit"
+                       asp-route-id="@t.Id"
+                       class="btn btn-primary btn-sm @(t.IsCompleted ? "disabled" : "")">
                         Edit
                     </a>
                 </td>

@@ -28,8 +28,8 @@ namespace Study_Timeline.Data.Repositories
 
             command.Parameters.AddWithValue("@Title", task.Title);
             command.Parameters.AddWithValue("@Description", task.Description);
-            command.Parameters.AddWithValue("@StartDateTime", task.StartTime);
-            command.Parameters.AddWithValue("@EndDateTime", task.EndTime);
+            command.Parameters.AddWithValue("@StartDateTime", (object?)task.StartTime ?? DBNull.Value);
+            command.Parameters.AddWithValue("@EndDateTime", (object?)task.EndTime ?? DBNull.Value);
             command.Parameters.AddWithValue("@Deadline", (object?)task.Deadline ?? DBNull.Value);
             command.Parameters.AddWithValue("@ProgressPercentage", task.ProgressPercentage);
             command.Parameters.AddWithValue("@IsCompleted", task.IsCompleted);

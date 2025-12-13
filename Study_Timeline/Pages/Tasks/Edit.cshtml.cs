@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Study_Timeline.Logic.Domain;
 using Study_Timeline.Logic.Services;
 using Study_Timeline.Models;
-using Task = Study_Timeline.Logic.Domain.Task;
 
 namespace Study_Timeline.View.Pages.Tasks
 {

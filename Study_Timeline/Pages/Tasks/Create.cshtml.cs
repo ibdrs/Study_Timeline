@@ -1,13 +1,10 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Study_Timeline.Logic.Domain;
+using Microsoft.AspNetCore.Mvc;
 using Study_Timeline.Logic.Services;
-using Study_Timeline.Models;
-using System.Threading.Tasks;
 using Task = Study_Timeline.Logic.Domain.Task;
 
 namespace Study_Timeline.View.Pages.Tasks
-{
+{ 
     public class CreateModel : PageModel
     {
         private readonly TaskService _taskService;
@@ -20,17 +17,58 @@ namespace Study_Timeline.View.Pages.Tasks
             _taskService = taskService;
         }
 
-        public void OnGet() { } 
+        private static DateTime TrimSeconds(DateTime dt) =>
+            new(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, 0);
+
+        public void OnGet()
+        {
+            CreateTaskInputModel.IsDeadline = true;
+            CreateTaskInputModel.StartTime = DateTime.Now;
+            CreateTaskInputModel.EndTime = DateTime.Now.AddHours(1);
+        }
+
         public IActionResult OnPost()
         {
+            if (CreateTaskInputModel.IsDeadline)
+            {
+                CreateTaskInputModel.StartTime = null;
+                CreateTaskInputModel.EndTime = null;
+
+                if (CreateTaskInputModel.Deadline == null)
+                {
+                    ModelState.AddModelError(
+                        nameof(CreateTaskInputModel.Deadline),
+                        "Deadline is required."
+                    );
+                }
+            }
+            else
+            {
+                CreateTaskInputModel.Deadline = null;
+
+                if (CreateTaskInputModel.StartTime == null ||
+                    CreateTaskInputModel.EndTime == null)
+                {
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "Start time and end time are required."
+                    );
+                }
+                else if (CreateTaskInputModel.EndTime <= CreateTaskInputModel.StartTime)
+                {
+                    ModelState.AddModelError(
+                        nameof(CreateTaskInputModel.EndTime),
+                        "End time must be after start time."
+                    );
+                }
+            }
+
             if (!ModelState.IsValid)
                 return Page();
 
-            // sanity check to check if there actually is a student
             if (HttpContext.Session.GetInt32("StudentId") == null)
                 return RedirectToPage("/Login");
 
-            // get our student id from browser session/cookies
             var studentId = HttpContext.Session.GetInt32("StudentId")!.Value;
 
             var task = new Task(
@@ -39,13 +77,21 @@ namespace Study_Timeline.View.Pages.Tasks
                 CreateTaskInputModel.Description
             );
 
-            task.SetSchedule(
-                CreateTaskInputModel.StartTime,
-                CreateTaskInputModel.EndTime
-            );
+            if (CreateTaskInputModel.IsDeadline)
+            {
+                task.SetDeadline(
+                    TrimSeconds(CreateTaskInputModel.Deadline!.Value)
+                );
+            }
+            else
+            {
+                task.SetSchedule(
+                    TrimSeconds(CreateTaskInputModel.StartTime!.Value),
+                    TrimSeconds(CreateTaskInputModel.EndTime!.Value)
+                );
+            }
 
             _taskService.AddTask(task);
-
 
             return RedirectToPage("Index");
         }
