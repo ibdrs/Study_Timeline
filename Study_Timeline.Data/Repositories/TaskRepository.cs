@@ -56,11 +56,11 @@ namespace Study_Timeline.Data.Repositories
         public void Update(Task task)
         {
             var query = @"UPDATE Tasks SET 
-                            Title=@Title, Description=@Description, 
-                            StartDateTime=@StartDateTime, EndDateTime=@EndDateTime, 
-                            Deadline=@Deadline, ProgressPercentage=@ProgressPercentage, 
-                            IsCompleted=@IsCompleted, CategoryId=@CategoryId
-                          WHERE Id=@Id";
+                    Title=@Title, Description=@Description, 
+                    StartDateTime=@StartDateTime, EndDateTime=@EndDateTime, 
+                    Deadline=@Deadline, ProgressPercentage=@ProgressPercentage, 
+                    IsCompleted=@IsCompleted, CategoryId=@CategoryId
+                  WHERE Id=@Id";
 
             using var connection = _factory.CreateConnection();
             using var command = new SqlCommand(query, connection);
@@ -68,8 +68,8 @@ namespace Study_Timeline.Data.Repositories
             command.Parameters.AddWithValue("@Id", task.Id);
             command.Parameters.AddWithValue("@Title", task.Title);
             command.Parameters.AddWithValue("@Description", task.Description);
-            command.Parameters.AddWithValue("@StartDateTime", task.StartTime);
-            command.Parameters.AddWithValue("@EndDateTime", task.EndTime);
+            command.Parameters.AddWithValue("@StartDateTime", (object?)task.StartTime ?? DBNull.Value);
+            command.Parameters.AddWithValue("@EndDateTime", (object?)task.EndTime ?? DBNull.Value);
             command.Parameters.AddWithValue("@Deadline", (object?)task.Deadline ?? DBNull.Value);
             command.Parameters.AddWithValue("@ProgressPercentage", task.ProgressPercentage);
             command.Parameters.AddWithValue("@IsCompleted", task.IsCompleted);
@@ -78,6 +78,7 @@ namespace Study_Timeline.Data.Repositories
             connection.Open();
             command.ExecuteNonQuery();
         }
+
 
         public List<Task> GetAll()
         {
