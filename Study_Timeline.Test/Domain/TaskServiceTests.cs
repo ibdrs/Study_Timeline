@@ -6,18 +6,18 @@ using Task = Study_Timeline.Logic.Domain.Task;
 
 public class TaskServiceTests
 {
-    private Task CreateTaskForStudent(string title = "Homework")
+    private Task CreateTaskForStudent(string title)
     {
         var student = new Student(1, "Ivan", "pass123");
 
-        // NEW TASK: no id, no schedule yet
+        // NEW TASK: no schedule yet
         var task = new Task(
             studentId: student.Id,
             title: title,
             description: "Test"
         );
 
-        // enforce invariant: task must have a schedule OR deadline
+        // task must have a schedule OR deadline
         task.SetSchedule(DateTime.Now, DateTime.Now.AddHours(1));
 
         // Add the task so it belongs to this student
@@ -51,6 +51,7 @@ public class TaskServiceTests
         var mockRepo = new Mock<ITaskRepository>();
         var service = new TaskService(mockRepo.Object);
 
+        // Act + Assert
         // empty title , should throw argument exception
         Assert.Throws<ArgumentException>(() =>
             CreateTaskForStudent("")
@@ -63,7 +64,7 @@ public class TaskServiceTests
     {
         // Arrange
         var mockRepo = new Mock<ITaskRepository>();
-        var task = CreateTaskForStudent();
+        var task = CreateTaskForStudent("Homework");
 
         mockRepo.Setup(r => r.GetById(task.Id)).Returns(task);
 
@@ -100,7 +101,7 @@ public class TaskServiceTests
         var mockRepo = new Mock<ITaskRepository>();
         var service = new TaskService(mockRepo.Object);
 
-        var task = CreateTaskForStudent();
+        var task = CreateTaskForStudent("Homework");
 
         // complete the task
         task.MarkCompleted();

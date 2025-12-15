@@ -102,12 +102,10 @@ namespace Study_Timeline.Data.Repositories
                     deadline: reader["Deadline"] as DateTime?,
                     progressPercentage: (int)reader["ProgressPercentage"],
                     isCompleted: (bool)reader["IsCompleted"],
-                    category: null
+                    category: reader["CategoryId"] is DBNull
+                        ? null
+                        : new Category(id: (int)reader["CategoryId"])
                 );
-
-                task.Category = reader["CategoryId"] is DBNull
-                    ? null
-                    : new Category { Id = (int)reader["CategoryId"] };
 
                 tasks.Add(task);
             }
@@ -141,12 +139,10 @@ namespace Study_Timeline.Data.Repositories
                 deadline: reader["Deadline"] as DateTime?,
                 progressPercentage: (int)reader["ProgressPercentage"],
                 isCompleted: (bool)reader["IsCompleted"],
-                category: null
+                category: reader["CategoryId"] is DBNull
+                    ? null
+                    : new Category(id: (int)reader["CategoryId"])
             );
-
-            task.Category = reader["CategoryId"] is DBNull
-                ? null
-                : new Category { Id = (int)reader["CategoryId"] };
 
             return task;
         }
@@ -178,12 +174,10 @@ namespace Study_Timeline.Data.Repositories
                     deadline: reader["Deadline"] as DateTime?,
                     progressPercentage: (int)reader["ProgressPercentage"],
                     isCompleted: (bool)reader["IsCompleted"],
-                    category: null
+                    category: reader["CategoryId"] is DBNull
+                        ? null
+                        : new Category(id: (int)reader["CategoryId"])
                 );
-
-                task.Category = reader["CategoryId"] is DBNull
-                    ? null
-                    : new Category { Id = (int)reader["CategoryId"] };
 
                 tasks.Add(task);
             }

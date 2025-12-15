@@ -21,10 +21,9 @@
         public string Name { get; private set; } = string.Empty;
         public string Password { get; private set; } = string.Empty;
 
-        public List<Task> Tasks { get; set; } = new();
+        public List<Task> Tasks { get; private set; } = new();
 
         // Domain behaviour
-
         private void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))

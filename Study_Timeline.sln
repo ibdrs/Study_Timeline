@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03. Data", "03. Data", "{B3
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "10. UnitTest", "10. UnitTest", "{978AA8B5-9936-4E5A-AE47-E2FC1181210A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Study_Timeline.Test", "Study_Timeline.Test\Study_Timeline.Test.csproj", "{175F1856-7BE3-4399-8D78-CF48BBB2D0B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Study_Timeline.Test", "Study_Timeline.Test\Study_Timeline.Test.csproj", "{175F1856-7BE3-4399-8D78-CF48BBB2D0B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

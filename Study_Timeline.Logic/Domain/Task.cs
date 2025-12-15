@@ -53,8 +53,31 @@
         public int ProgressPercentage { get; private set; }
         public bool IsCompleted { get; private set; }
 
-        public Category? Category { get; set; }
+        public Category? Category { get; private set; }
 
+
+        // A Task must have exactly ONE of:
+        // - a schedule (StartTime + EndTime)
+        // - OR a deadline
+        // It may never have both, and never have neither.
+        private void ApplyTimeConstraints(
+            DateTime? start,
+            DateTime? end,
+            DateTime? deadline)
+        {
+            if (!deadline.HasValue && !(start.HasValue && end.HasValue))
+                throw new InvalidOperationException("Task must have either a schedule or a deadline.");
+
+            if (deadline.HasValue && (start.HasValue || end.HasValue))
+                throw new InvalidOperationException("Task cannot have both a schedule and a deadline.");
+
+            if (start.HasValue && end.HasValue && start > end)
+                throw new InvalidOperationException("Start time cannot be after end time.");
+
+            StartTime = start;
+            EndTime = end;
+            Deadline = deadline;
+        }
 
         // Domain behaviour
         public void UpdateDetails(
@@ -82,29 +105,6 @@
         public void SetDeadline(DateTime deadline)
         {
             ApplyTimeConstraints(null, null, deadline);
-        }
-
-        // A Task must have exactly ONE of:
-        // - a schedule (StartTime + EndTime)
-        // - OR a deadline
-        // It may never have both, and never have neither.
-        private void ApplyTimeConstraints(
-            DateTime? start,
-            DateTime? end,
-            DateTime? deadline)
-        {
-            if (!deadline.HasValue && !(start.HasValue && end.HasValue))
-                throw new InvalidOperationException("Task must have either a schedule or a deadline.");
-
-            if (deadline.HasValue && (start.HasValue || end.HasValue))
-                throw new InvalidOperationException("Task cannot have both a schedule and a deadline.");
-
-            if (start.HasValue && end.HasValue && start > end)
-                throw new InvalidOperationException("Start time cannot be after end time.");
-
-            StartTime = start;
-            EndTime = end;
-            Deadline = deadline;
         }
 
         public void MarkCompleted()
