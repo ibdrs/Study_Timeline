@@ -5,7 +5,6 @@
         // Hydration constructor (repository)
         public Task(
             int id,
-            int studentId,
             string title,
             string description,
             DateTime? startTime,
@@ -16,7 +15,6 @@
             Category? category)
         {
             Id = id;
-            StudentId = studentId;
             Title = title;
             Description = description;
 
@@ -28,12 +26,11 @@
         }
 
         // Creation constructor (new task)
-        public Task(int studentId, string title, string description)
+        public Task(string title, string description)
         {
             if (string.IsNullOrWhiteSpace(title))
                 throw new ArgumentException("Task title cannot be empty.");
 
-            StudentId = studentId;
             Title = title;
             Description = description;
             ProgressPercentage = 0;
@@ -41,7 +38,6 @@
         }
 
         public int Id { get; private set; }
-        public int StudentId { get; private set; }
 
         public string Title { get; private set; }
         public string Description { get; private set; }

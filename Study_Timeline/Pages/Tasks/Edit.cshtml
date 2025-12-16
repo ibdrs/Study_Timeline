@@ -16,24 +16,65 @@
         <textarea asp-for="EditTaskInputModel.Description" class="form-control"></textarea>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="EditTaskInputModel.StartTime" class="form-label"></label>
-        <input asp-for="EditTaskInputModel.StartTime"
+    <!-- TYPE SELECTION -->
+    <div class="mb-3 d-flex gap-4">
+        <div class="form-check">
+            <input class="form-check-input"
+                   type="radio"
+                   asp-for="EditTaskInputModel.IsDeadline"
+                   value="true"
+                   id="deadlineRadio" />
+            <label class="form-check-label" for="deadlineRadio">
+                Deadline
+            </label>
+        </div>
+
+        <div class="form-check">
+            <input class="form-check-input"
+                   type="radio"
+                   asp-for="EditTaskInputModel.IsDeadline"
+                   value="false"
+                   id="rangeRadio" />
+            <label class="form-check-label" for="rangeRadio">
+                Start & End time
+            </label>
+        </div>
+    </div>
+
+    <!-- DEADLINE -->
+    <div class="mb-3" id="deadlineBlock">
+        <label asp-for="EditTaskInputModel.Deadline" class="form-label"></label>
+        <input asp-for="EditTaskInputModel.Deadline"
                class="form-control"
                type="datetime-local"
                step="60" />
+        <span asp-validation-for="EditTaskInputModel.Deadline" class="text-danger"></span>
+    </div>
+
+    <!-- START / END -->
+    <div id="rangeBlock">
+        <div class="mb-3">
+            <label asp-for="EditTaskInputModel.StartTime" class="form-label"></label>
+            <input asp-for="EditTaskInputModel.StartTime"
+                   class="form-control"
+                   type="datetime-local"
+                   step="60" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="EditTaskInputModel.EndTime" class="form-label"></label>
+            <input asp-for="EditTaskInputModel.EndTime"
+                   class="form-control"
+                   type="datetime-local"
+                   step="60" />
+            <span asp-validation-for="EditTaskInputModel.EndTime" class="text-danger"></span>
+        </div>
     </div>
 
     <div class="mb-3">
-        <label asp-for="EditTaskInputModel.EndTime" class="form-label"></label>
-        <input asp-for="EditTaskInputModel.EndTime"
-               class="form-control"
-               type="datetime-local"
-               step="60" />
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="EditTaskInputModel.ProgressPercentage" class="form-label">Progress (%)</label>
+        <label asp-for="EditTaskInputModel.ProgressPercentage" class="form-label">
+            Progress (%)
+        </label>
 
         <span id="progressValue" class="fw-bold d-block mb-1" style="font-size: 1.1rem">
             @Model.EditTaskInputModel.ProgressPercentage%
@@ -50,7 +91,6 @@
 </form>
 
 <div class="d-flex gap-2 mt-3">
-
     <button type="submit" form="editForm" class="btn btn-primary">Save</button>
 
     <form method="post"
@@ -71,8 +111,25 @@
         slider.addEventListener("input", function () {
             label.textContent = slider.value + "%";
         });
+
+        function toggleTimeInputs() {
+            const isDeadline =
+                document.querySelector('input[name="EditTaskInputModel.IsDeadline"]:checked')
+                    ?.value === "true";
+
+            document.getElementById("deadlineBlock").style.display =
+                isDeadline ? "block" : "none";
+
+            document.getElementById("rangeBlock").style.display =
+                isDeadline ? "none" : "block";
+        }
+
+        document
+            .querySelectorAll('input[name="EditTaskInputModel.IsDeadline"]')
+            .forEach(radio => radio.addEventListener("change", toggleTimeInputs));
+
+        toggleTimeInputs();
     </script>
 
     <partial name="_ValidationScriptsPartial" />
 }
-

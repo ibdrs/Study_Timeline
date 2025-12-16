@@ -5,11 +5,15 @@ namespace Study_Timeline.Logic.Services
 {
     public class StudentService
     {
-        private readonly IStudentRepository _repo;
+        private readonly IStudentRepository _studentRepo;
+        private readonly ITaskRepository _taskRepo;
 
-        public StudentService(IStudentRepository repo)
+
+        public StudentService(IStudentRepository studentRepo, ITaskRepository taskRepo)
         {
-            _repo = repo;
+            _studentRepo = studentRepo;
+            _taskRepo = taskRepo; 
+
         }
 
         public Student? GetStudentByUser(string username)
@@ -17,12 +21,12 @@ namespace Study_Timeline.Logic.Services
             if (string.IsNullOrWhiteSpace(username))
                 throw new ArgumentException("Username cannot be empty.");
 
-            return _repo.GetByUser(username);
+            return _studentRepo.GetByUser(username);
         }
 
-        public void AddStudent(Student student)
+        public void RegisterStudent(Student student)
         {
-            _repo.Add(student);
+            _studentRepo.Add(student);
         }
 
 
@@ -41,5 +45,41 @@ namespace Study_Timeline.Logic.Services
 
             return student;
         }
+
+        public void AddTaskForStudent(
+            int studentId,
+            string title,
+            string description,
+            DateTime? start,
+            DateTime? end,
+            DateTime? deadline)
+        {
+            var student = _studentRepo.GetById(studentId)
+                ?? throw new InvalidOperationException("Student not found");
+
+            if (deadline == null && (start == null || end == null))
+                throw new InvalidOperationException(
+                    "Task must have either a deadline or a start and end time."
+                );
+
+            var task = student.AddTask(title, description);
+
+            if (deadline.HasValue)
+            {
+                task.SetDeadline(TrimSeconds(deadline.Value));
+            }
+            else
+            {
+                task.SetSchedule(
+                    TrimSeconds(start!.Value),
+                    TrimSeconds(end!.Value)
+                );
+            }
+
+            _taskRepo.Add(task, student.Id);
+        }
+
+        private static DateTime TrimSeconds(DateTime dt) =>
+            new(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, 0);
     }
 }

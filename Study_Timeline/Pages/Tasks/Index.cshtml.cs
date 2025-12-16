@@ -26,16 +26,23 @@ namespace Study_Timeline.View.Pages.Tasks
             return Page();
         }
 
-
         public IActionResult OnPostDelete(int id)
         {
-            _taskService.DeleteTask(id);
+            var studentId = HttpContext.Session.GetInt32("StudentId");
+            if (studentId == null)
+                return RedirectToPage("/Login");
+
+            _taskService.DeleteTaskForStudent(studentId.Value, id);
             return RedirectToPage();
         }
 
         public IActionResult OnPostComplete(int id)
         {
-            _taskService.CompleteTask(id);
+            var studentId = HttpContext.Session.GetInt32("StudentId");
+            if (studentId == null)
+                return RedirectToPage("/Login");
+
+            _taskService.CompleteTaskForStudent(studentId.Value, id);
             return RedirectToPage();
         }
     }

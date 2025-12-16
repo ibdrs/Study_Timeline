@@ -16,24 +16,26 @@ namespace Study_Timeline.View.Pages.Tasks
         {
             _taskService = taskService;
         }
+
         public IActionResult OnGet(int id)
         {
             var studentId = HttpContext.Session.GetInt32("StudentId");
             if (studentId == null)
                 return RedirectToPage("/Login");
 
-            var task = _taskService.GetTaskById(id);
-            if (task == null || task.StudentId != studentId.Value)
+            var task = _taskService.GetTaskForStudent(id, studentId.Value);
+            if (task == null)
                 return NotFound();
-
 
             EditTaskInputModel = new EditTaskInputModel
             {
                 Id = task.Id,
                 Title = task.Title,
                 Description = task.Description,
-                StartTime = task.StartTime ?? DateTime.Now,
-                EndTime = task.EndTime ?? DateTime.Now.AddHours(1),
+                IsDeadline = task.Deadline != null,
+                Deadline = task.Deadline,
+                StartTime = task.StartTime,
+                EndTime = task.EndTime,
                 ProgressPercentage = task.ProgressPercentage
             };
 
@@ -42,6 +44,40 @@ namespace Study_Timeline.View.Pages.Tasks
 
         public IActionResult OnPost(int id)
         {
+            // UI Validation for time constraints
+            if (EditTaskInputModel.IsDeadline)
+            {
+                EditTaskInputModel.StartTime = null;
+                EditTaskInputModel.EndTime = null;
+
+                if (EditTaskInputModel.Deadline == null)
+                {
+                    ModelState.AddModelError(
+                        nameof(EditTaskInputModel.Deadline),
+                        "Deadline is required."
+                    );
+                }
+            }
+            else
+            {
+                EditTaskInputModel.Deadline = null;
+
+                if (EditTaskInputModel.StartTime == null || EditTaskInputModel.EndTime == null)
+                {
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "Start time and end time are required."
+                    );
+                }
+                else if (EditTaskInputModel.EndTime <= EditTaskInputModel.StartTime)
+                {
+                    ModelState.AddModelError(
+                        nameof(EditTaskInputModel.EndTime),
+                        "End time must be after start time."
+                    );
+                }
+            }
+
             if (!ModelState.IsValid)
                 return Page();
 
@@ -49,25 +85,20 @@ namespace Study_Timeline.View.Pages.Tasks
             if (studentId == null)
                 return RedirectToPage("/Login");
 
-            var task = _taskService.GetTaskById(id);
-            if (task == null || task.StudentId != studentId.Value)
-                return NotFound();
-
-            task.UpdateDetails(
+            _taskService.UpdateTaskForStudent(
+                studentId.Value,
+                id,
                 EditTaskInputModel.Title,
                 EditTaskInputModel.Description,
-                EditTaskInputModel.StartTime,
-                EditTaskInputModel.EndTime,
-                null
+                EditTaskInputModel.Deadline == null ? EditTaskInputModel.StartTime : null,
+                EditTaskInputModel.Deadline == null ? EditTaskInputModel.EndTime : null,
+                EditTaskInputModel.Deadline,
+                EditTaskInputModel.ProgressPercentage
             );
 
-            task.UpdateProgress(EditTaskInputModel.ProgressPercentage);
-
-            _taskService.UpdateTask(task);
 
             return RedirectToPage("Index");
         }
-
 
         public IActionResult OnPostComplete(int id)
         {
@@ -75,11 +106,8 @@ namespace Study_Timeline.View.Pages.Tasks
             if (studentId == null)
                 return RedirectToPage("/Login");
 
-            var task = _taskService.GetTaskById(id);
-            if (task == null || task.StudentId != studentId.Value)
-                return NotFound();
+            _taskService.CompleteTaskForStudent(studentId.Value, id);
 
-            _taskService.CompleteTask(id);
             return RedirectToPage("Index");
         }
     }

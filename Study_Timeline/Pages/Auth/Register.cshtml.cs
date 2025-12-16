@@ -28,7 +28,7 @@ namespace Study_Timeline.Pages.Auth
                 return Page();
             }
             Student student = new Student(StudentRegistration.UserName, StudentRegistration.Password);
-            service.AddStudent(student);
+            service.RegisterStudent(student);
 
             TempData["RegisterSuccess"] = "Your account has been created successfully. You can now log in.";
             return RedirectToPage("/Auth/Login");

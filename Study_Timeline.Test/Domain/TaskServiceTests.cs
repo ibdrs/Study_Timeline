@@ -6,13 +6,14 @@ using Task = Study_Timeline.Logic.Domain.Task;
 
 public class TaskServiceTests
 {
+    private const int StudentId = 1;
+
     private Task CreateTaskForStudent(string title)
     {
-        var student = new Student(1, "Ivan", "pass123");
+        var student = new Student(StudentId, "Ivan", "pass123");
 
         // NEW TASK: no schedule yet
-        var task = new Task(
-            studentId: student.Id,
+        var task = student.AddTask(
             title: title,
             description: "Test"
         );
@@ -20,15 +21,12 @@ public class TaskServiceTests
         // task must have a schedule OR deadline
         task.SetSchedule(DateTime.Now, DateTime.Now.AddHours(1));
 
-        // Add the task so it belongs to this student
-        student.AddTask(task);
-
         return task;
     }
 
-    // Test 1 - AddTask moet validatie doen + repo aanroepen
+    // Test 1 - UpdateTask moet repo aanroepen wanneer geldig
     [Fact]
-    public void AddTask_Should_Add_Task_When_Valid()
+    public void UpdateTaskForStudent_Should_Update_Task_When_Valid()
     {
         // Arrange
         var mockRepo = new Mock<ITaskRepository>();
@@ -36,22 +34,31 @@ public class TaskServiceTests
 
         var task = CreateTaskForStudent("Homework");
 
+        mockRepo.Setup(r => r.GetById(task.Id)).Returns(task);
+        mockRepo.Setup(r => r.IsTaskOwnedByStudent(task.Id, StudentId)).Returns(true);
+
         // Act
-        service.AddTask(task);
+        service.UpdateTaskForStudent(
+            StudentId,
+            task.Id,
+            "Homework updated",
+            "Updated desc",
+            task.StartTime,
+            task.EndTime,
+            null,
+            50
+        );
 
         // Assert
-        mockRepo.Verify(r => r.Add(task), Times.Once);
+        mockRepo.Verify(r => r.Update(task), Times.Once);
+        Assert.Equal(50, task.ProgressPercentage);
     }
 
     // Test 2 — AddTask moet fout geven zonder titel
     [Fact]
     public void AddTask_Should_Throw_When_Title_Is_Empty()
     {
-        // Arrange
-        var mockRepo = new Mock<ITaskRepository>();
-        var service = new TaskService(mockRepo.Object);
-
-        // Act + Assert
+        // Arrange + Act + Assert
         // empty title , should throw argument exception
         Assert.Throws<ArgumentException>(() =>
             CreateTaskForStudent("")
@@ -60,18 +67,19 @@ public class TaskServiceTests
 
     // Test 3 — CompleteTask moet task ophalen, status wijzigen en opslaan
     [Fact]
-    public void CompleteTask_Should_Mark_Task_As_Completed_And_Update_Repo()
+    public void CompleteTaskForStudent_Should_Mark_Task_As_Completed_And_Update_Repo()
     {
         // Arrange
         var mockRepo = new Mock<ITaskRepository>();
         var task = CreateTaskForStudent("Homework");
 
         mockRepo.Setup(r => r.GetById(task.Id)).Returns(task);
+        mockRepo.Setup(r => r.IsTaskOwnedByStudent(task.Id, StudentId)).Returns(true);
 
         var service = new TaskService(mockRepo.Object);
 
         // Act
-        service.CompleteTask(task.Id);
+        service.CompleteTaskForStudent(StudentId, task.Id);
 
         // Assert
         Assert.True(task.IsCompleted);
@@ -90,12 +98,14 @@ public class TaskServiceTests
         var service = new TaskService(mockRepo.Object);
 
         // Act + Assert
-        Assert.Throws<KeyNotFoundException>(() => service.CompleteTask(10));
+        Assert.Throws<KeyNotFoundException>(() =>
+            service.CompleteTaskForStudent(StudentId, 10)
+        );
     }
 
-    // Test 5 — UpdateTask mag niet als IsCompleted = true
+    // Test 5 — UpdateTask mag niet als student geen eigenaar is
     [Fact]
-    public void UpdateTask_Should_Throw_When_Task_Is_Completed()
+    public void UpdateTask_Should_Throw_When_Task_Not_Owned_By_Student()
     {
         // Arrange
         var mockRepo = new Mock<ITaskRepository>();
@@ -103,12 +113,21 @@ public class TaskServiceTests
 
         var task = CreateTaskForStudent("Homework");
 
-        // complete the task
-        task.MarkCompleted();
-
         mockRepo.Setup(r => r.GetById(task.Id)).Returns(task);
+        mockRepo.Setup(r => r.IsTaskOwnedByStudent(task.Id, StudentId)).Returns(false);
 
         // Act + Assert
-        Assert.Throws<InvalidOperationException>(() => service.UpdateTask(task));
+        Assert.Throws<UnauthorizedAccessException>(() =>
+            service.UpdateTaskForStudent(
+                StudentId,
+                task.Id,
+                "X",
+                "Y",
+                task.StartTime,
+                task.EndTime,
+                null,
+                20
+            )
+        );
     }
 }

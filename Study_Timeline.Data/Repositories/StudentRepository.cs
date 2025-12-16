@@ -36,6 +36,29 @@ namespace Study_Timeline.Data.Repositories
             );
         }
 
+        public Student? GetById(int studentId)
+        {
+            using var connection = _factory.CreateConnection();
+            using var command = new SqlCommand(
+                "SELECT Id, Name, Password FROM Students WHERE Id=@Id",
+                connection
+            );
+
+            command.Parameters.AddWithValue("@Id", studentId);
+
+            connection.Open();
+            using var reader = command.ExecuteReader();
+
+            if (!reader.Read()) 
+                return null;
+
+            return new Student(
+                id: (int)reader["Id"],
+                name: reader["Name"].ToString()!,
+                password: reader["Password"].ToString()!
+                );
+        }
+
 
         public void Add(Student student)
         {

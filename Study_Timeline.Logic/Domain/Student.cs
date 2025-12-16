@@ -40,12 +40,11 @@
             Password = password;
         }
 
-        public void AddTask(Task task)
+        public Task AddTask(string title, string description)
         {
-            if (task == null)
-                throw new ArgumentNullException(nameof(task));
-
+            var task = new Task(title, description);
             Tasks.Add(task);
+            return task;
         }
 
         public void RemoveTask(Task task)

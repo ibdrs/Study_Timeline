@@ -14,14 +14,14 @@ namespace Study_Timeline.Data.Repositories
             _factory = factory;
         }
 
-        public void Add(Task task)
+        public void Add(Task task, int studentId)
         {
             var query = @"INSERT INTO Tasks 
-                          (Title, Description, StartDateTime, EndDateTime, Deadline, 
-                           ProgressPercentage, IsCompleted, StudentId, CategoryId)
-                          VALUES 
-                          (@Title, @Description, @StartDateTime, @EndDateTime, @Deadline, 
-                           @ProgressPercentage, @IsCompleted, @StudentId, @CategoryId)";
+        (Title, Description, StartDateTime, EndDateTime, Deadline, 
+         ProgressPercentage, IsCompleted, StudentId, CategoryId)
+        VALUES 
+        (@Title, @Description, @StartDateTime, @EndDateTime, @Deadline, 
+         @ProgressPercentage, @IsCompleted, @StudentId, @CategoryId)";
 
             using var connection = _factory.CreateConnection();
             using var command = new SqlCommand(query, connection);
@@ -33,12 +33,13 @@ namespace Study_Timeline.Data.Repositories
             command.Parameters.AddWithValue("@Deadline", (object?)task.Deadline ?? DBNull.Value);
             command.Parameters.AddWithValue("@ProgressPercentage", task.ProgressPercentage);
             command.Parameters.AddWithValue("@IsCompleted", task.IsCompleted);
-            command.Parameters.AddWithValue("@StudentId", task.StudentId);
+            command.Parameters.AddWithValue("@StudentId", studentId);
             command.Parameters.AddWithValue("@CategoryId", (object?)task.Category?.Id ?? DBNull.Value);
 
             connection.Open();
             command.ExecuteNonQuery();
         }
+
 
         public void Delete(int id)
         {
@@ -94,7 +95,6 @@ namespace Study_Timeline.Data.Repositories
             {
                 var task = new Task(
                     id: (int)reader["Id"],
-                    studentId: (int)reader["StudentId"],
                     title: reader["Title"].ToString()!,
                     description: reader["Description"].ToString()!,
                     startTime: reader["StartDateTime"] as DateTime?,
@@ -131,7 +131,6 @@ namespace Study_Timeline.Data.Repositories
 
             var task = new Task(
                 id: (int)reader["Id"],
-                studentId: (int)reader["StudentId"],
                 title: reader["Title"].ToString()!,
                 description: reader["Description"].ToString()!,
                 startTime: reader["StartDateTime"] as DateTime?,
@@ -166,7 +165,6 @@ namespace Study_Timeline.Data.Repositories
             {
                 var task = new Task(
                     id: (int)reader["Id"],
-                    studentId: (int)reader["StudentId"],
                     title: reader["Title"].ToString()!,
                     description: reader["Description"].ToString()!,
                     startTime: reader["StartDateTime"] as DateTime?,
@@ -183,6 +181,23 @@ namespace Study_Timeline.Data.Repositories
             }
 
             return tasks;
+        }
+
+        public bool IsTaskOwnedByStudent(int taskId, int studentId)
+        {
+            using var connection = _factory.CreateConnection();
+            using var command = new SqlCommand(
+                "SELECT COUNT(*) FROM Tasks WHERE Id = @TaskId AND StudentId = @StudentId",
+                connection
+                );
+
+            command.Parameters.AddWithValue("@TaskId", taskId);
+            command.Parameters.AddWithValue("@StudentId", studentId);
+
+            connection.Open();
+
+            var count = (int)command.ExecuteScalar();
+            return count > 0;
         }
     }
 }

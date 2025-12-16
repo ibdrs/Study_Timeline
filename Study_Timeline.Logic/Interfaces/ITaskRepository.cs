@@ -4,13 +4,14 @@ namespace Study_Timeline.Logic.Interfaces
 {
     public interface ITaskRepository
     {
-        void Add(Task task);
+        void Add(Task task, int studentId);
         void Update(Task task);
         void Delete(int id);
 
         Task? GetById(int id);
         List<Task> GetAll();
         List<Task> GetByStudentId(int studentId);
+        bool IsTaskOwnedByStudent(int taskId, int studentId);
     }
 
 }

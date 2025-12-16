@@ -9,17 +9,14 @@ namespace Study_Timeline.Test.Domain
         {
             var student = new Student(id: 1, name: "Ivan", password: "pass123");
 
-            var task = new Task
-            (
-                studentId: 1,
+            // NEW TASK: created via Student
+            var task = student.AddTask(
                 title: "Study",
                 description: "Test"
             );
 
+            // task must have a schedule OR deadline
             task.SetSchedule(DateTime.Now, DateTime.Now.AddHours(1));
-
-            // Add the task so it belongs to this student
-            student.AddTask(task); 
 
             return task;
         }
@@ -37,7 +34,6 @@ namespace Study_Timeline.Test.Domain
             Assert.True(task.IsCompleted);
             Assert.Equal(100, task.ProgressPercentage);
         }
-
 
         [Theory]
         [InlineData(-5)]
@@ -58,7 +54,10 @@ namespace Study_Timeline.Test.Domain
         public void Task_ShouldThrow_WhenNoScheduleOrDeadlineProvided()
         {
             // Arrange
-            var task = new Task(1, "Study", "Test");
+            var task = new Task(
+                title: "Study",
+                description: "Test"
+            );
 
             // Act
             Action act = () => task.UpdateDetails(

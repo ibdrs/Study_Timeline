@@ -30,43 +30,93 @@ namespace Study_Timeline.Logic.Services
             return _repo.GetByStudentId(studentId);
         }
 
-        // Add a new task
-        public void AddTask(Task task)
-		{
-            _repo.Add(task);
-		}
+        public Task? GetTaskForStudent(int taskId, int studentId)
+        {
+            var task = _repo.GetById(taskId);
+            if (task == null)
+                return null;
 
-		// Update an existing task
-		public void UpdateTask(Task task)
-		{
-			var existing = _repo.GetById(task.Id);
-			if (existing == null)
-				throw new KeyNotFoundException($"Task with Id {task.Id} not found.");
-			if (existing.IsCompleted)
-				throw new InvalidOperationException("Cannot edit completed tasks.");
+            if (!_repo.IsTaskOwnedByStudent(taskId, studentId))
+                return null;
 
-			_repo.Update(task);
-		}
+            return task;
+        }
 
-		// Delete a task
-		public void DeleteTask(int id)
-		{
-			var existing = _repo.GetById(id);
-			if (existing == null)
-				throw new KeyNotFoundException($"Task with Id {id} not found.");
+        // Update an existing task
+        public void UpdateTaskForStudent(
+            int studentId,
+            int taskId,
+            string title,
+            string description,
+            DateTime? start,
+            DateTime? end,
+            DateTime? deadline,
+            int progress)
+        {
+            var task = _repo.GetById(taskId)
+                ?? throw new KeyNotFoundException("Task not found.");
 
-			_repo.Delete(id);
-		}
+            if (!_repo.IsTaskOwnedByStudent(taskId, studentId))
+                throw new UnauthorizedAccessException();
 
-		// Mark task as completed
-		public void CompleteTask(int id)
-		{
-			var task = _repo.GetById(id);
-			if (task == null)
-				throw new KeyNotFoundException($"Task with Id {id} not found.");
+            if (deadline == null && (start == null || end == null))
+                throw new InvalidOperationException(
+                    "Task must have either a deadline or a start and end time."
+                );
 
-			task.MarkCompleted();
-			_repo.Update(task);
-		}
+            if (deadline.HasValue)
+            {
+                task.UpdateDetails(
+                    title,
+                    description,
+                    null,
+                    null,
+                    TrimSeconds(deadline.Value)
+                );
+            }
+            else
+            {
+                task.UpdateDetails(
+                    title,
+                    description,
+                    TrimSeconds(start!.Value),
+                    TrimSeconds(end!.Value),
+                    null
+                );
+            }
+
+            task.UpdateProgress(progress);
+
+            _repo.Update(task);
+        }
+
+
+        // Delete a task
+        public void DeleteTaskForStudent(int studentId, int taskId)
+        {
+            var task = _repo.GetById(taskId)
+                ?? throw new KeyNotFoundException("Task not found.");
+
+            if (!_repo.IsTaskOwnedByStudent(taskId, studentId))
+                throw new UnauthorizedAccessException();
+
+            _repo.Delete(taskId);
+        }
+
+        // Mark task as completed
+        public void CompleteTaskForStudent(int studentId, int taskId)
+        {
+            var task = _repo.GetById(taskId)
+                ?? throw new KeyNotFoundException("Task not found.");
+
+            if (!_repo.IsTaskOwnedByStudent(taskId, studentId))
+                throw new UnauthorizedAccessException();
+
+            task.MarkCompleted();
+            _repo.Update(task);
+        }
+
+        private static DateTime TrimSeconds(DateTime dt) =>
+            new(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, 0);
     }
 }
