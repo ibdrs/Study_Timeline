@@ -2,12 +2,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Study_Timeline.Logic.Services;
 using Study_Timeline.Models;
+using Task = Study_Timeline.Logic.Domain.Task;
 
 namespace Study_Timeline.View.Pages.Tasks
 {
     public class EditModel : PageModel
     {
         private readonly TaskService _taskService;
+
+        private static DateTime TrimSeconds(DateTime dt) =>
+            new(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, 0);
 
         [BindProperty]
         public EditTaskInputModel EditTaskInputModel { get; set; } = new();
@@ -85,17 +89,17 @@ namespace Study_Timeline.View.Pages.Tasks
             if (studentId == null)
                 return RedirectToPage("/Login");
 
-            _taskService.UpdateTaskForStudent(
-                studentId.Value,
-                id,
+            var updatedTask = new Task(
                 EditTaskInputModel.Title,
                 EditTaskInputModel.Description,
-                EditTaskInputModel.Deadline == null ? EditTaskInputModel.StartTime : null,
-                EditTaskInputModel.Deadline == null ? EditTaskInputModel.EndTime : null,
-                EditTaskInputModel.Deadline,
-                EditTaskInputModel.ProgressPercentage
+                EditTaskInputModel.StartTime == null ? null : TrimSeconds(EditTaskInputModel.StartTime.Value),
+                EditTaskInputModel.EndTime == null ? null : TrimSeconds(EditTaskInputModel.EndTime.Value),
+                EditTaskInputModel.Deadline == null ? null : TrimSeconds(EditTaskInputModel.Deadline.Value)
             );
 
+            updatedTask.UpdateProgress(EditTaskInputModel.ProgressPercentage);
+
+            _taskService.UpdateTaskForStudent(studentId.Value, id, updatedTask);
 
             return RedirectToPage("Index");
         }

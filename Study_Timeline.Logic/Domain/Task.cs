@@ -29,28 +29,48 @@
             Category? category)
         {
             Id = id;
-            Title = title;
+            SetTitle(title);
             Description = description;
 
             ApplyTimeConstraints(startTime, endTime, deadline);
 
-            ProgressPercentage = progressPercentage;
+            SetProgress(progressPercentage);
             IsCompleted = isCompleted;
             Category = category;
         }
 
         // Creation constructor (new task)
-        public Task(string title, string description)
+        public Task(
+            string title,
+            string description,
+            DateTime? startTime,
+            DateTime? endTime,
+            DateTime? deadline)
+        {
+            SetTitle(title);
+            Description = description;
+
+            ApplyTimeConstraints(startTime, endTime, deadline);
+
+            ProgressPercentage = 0;
+            IsCompleted = false;
+        }
+
+        private void SetTitle(string title)
         {
             if (string.IsNullOrWhiteSpace(title))
                 throw new ArgumentException("Task title cannot be empty.");
 
             Title = title;
-            Description = description;
-            ProgressPercentage = 0;
-            IsCompleted = false;
         }
 
+        private void SetProgress(int percent)
+        {
+            if (percent < 0 || percent > 100)
+                throw new ArgumentOutOfRangeException(nameof(percent));
+
+            ProgressPercentage = percent;
+        }
 
         // A Task must have exactly ONE of:
         // - a schedule (StartTime + EndTime)
@@ -84,10 +104,7 @@
             DateTime? deadline
             )
         {
-            if (string.IsNullOrWhiteSpace(title))
-                throw new ArgumentException("Title cannot be empty.");
-
-            Title = title;
+            SetTitle(title);
             Description = description;
 
             ApplyTimeConstraints(startTime, endTime, deadline);
@@ -111,10 +128,7 @@
 
         public void UpdateProgress(int percent)
         {
-            if (percent < 0 || percent > 100)
-                throw new ArgumentOutOfRangeException();
-
-            ProgressPercentage = percent;
+            SetProgress(percent);
 
             if (percent == 100)
                 MarkCompleted();

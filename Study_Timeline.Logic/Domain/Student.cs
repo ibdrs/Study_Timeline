@@ -29,7 +29,6 @@
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Name cannot be empty.");
 
-            //ToDo: validatie geen nummers in naam toevoegen
             Name = name;
         }
 
@@ -41,9 +40,11 @@
             Password = password;
         }
 
-        public Task AddTask(string title, string description)
+        public Task AddTask(Task task)
         {
-            var task = new Task(title, description);
+            if (task == null)
+                throw new ArgumentNullException(nameof(task));
+
             Tasks.Add(task);
             return task;
         }

@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
 using Study_Timeline.Logic.Services;
-using Study_Timeline.Logic.Domain;
-
+using Task = Study_Timeline.Logic.Domain.Task;
 
 namespace Study_Timeline.View.Pages.Tasks
-{ 
+{
     public class CreateModel : PageModel
     {
         private readonly StudentService _studentService;
@@ -72,14 +71,15 @@ namespace Study_Timeline.View.Pages.Tasks
 
             var studentId = HttpContext.Session.GetInt32("StudentId")!.Value;
 
-            _studentService.AddTaskForStudent(
-                studentId,
+            var task = new Task(
                 CreateTaskInputModel.Title,
                 CreateTaskInputModel.Description,
-                CreateTaskInputModel.StartTime,
-                CreateTaskInputModel.EndTime,
-                CreateTaskInputModel.Deadline
+                CreateTaskInputModel.StartTime == null ? null : TrimSeconds(CreateTaskInputModel.StartTime.Value),
+                CreateTaskInputModel.EndTime == null ? null : TrimSeconds(CreateTaskInputModel.EndTime.Value),
+                CreateTaskInputModel.Deadline == null ? null : TrimSeconds(CreateTaskInputModel.Deadline.Value)
             );
+
+            _studentService.AddTaskForStudent(studentId, task);
 
             return RedirectToPage("Index");
         }

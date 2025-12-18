@@ -9,14 +9,16 @@ namespace Study_Timeline.Test.Domain
         {
             var student = new Student(id: 1, name: "Ivan", password: "pass123");
 
-            // NEW TASK: created via Student
-            var task = student.AddTask(
+            // task must have a schedule OR deadline
+            var task = new Task(
                 title: "Study",
-                description: "Test"
+                description: "Test",
+                startTime: DateTime.Now,
+                endTime: DateTime.Now.AddHours(1),
+                deadline: null
             );
 
-            // task must have a schedule OR deadline
-            task.SetSchedule(DateTime.Now, DateTime.Now.AddHours(1));
+            student.AddTask(task);
 
             return task;
         }
@@ -53,23 +55,16 @@ namespace Study_Timeline.Test.Domain
         [Fact]
         public void Task_ShouldThrow_WhenNoScheduleOrDeadlineProvided()
         {
-            // Arrange
-            var task = new Task(
-                title: "Study",
-                description: "Test"
+            // Arrange + Act + Assert
+            Assert.Throws<InvalidOperationException>(() =>
+                new Task(
+                    title: "Study",
+                    description: "Test",
+                    startTime: null,
+                    endTime: null,
+                    deadline: null
+                )
             );
-
-            // Act
-            Action act = () => task.UpdateDetails(
-                "Study",
-                "Test",
-                startTime: null,
-                endTime: null,
-                deadline: null
-            );
-
-            // Assert
-            Assert.Throws<InvalidOperationException>(act);
         }
     }
 }

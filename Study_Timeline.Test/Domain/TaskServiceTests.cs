@@ -12,14 +12,16 @@ public class TaskServiceTests
     {
         var student = new Student(StudentId, "Ivan", "pass123");
 
-        // NEW TASK: no schedule yet
-        var task = student.AddTask(
+        // task must have a schedule OR deadline
+        var task = new Task(
             title: title,
-            description: "Test"
+            description: "Test",
+            startTime: DateTime.Now,
+            endTime: DateTime.Now.AddHours(1),
+            deadline: null
         );
 
-        // task must have a schedule OR deadline
-        task.SetSchedule(DateTime.Now, DateTime.Now.AddHours(1));
+        student.AddTask(task);
 
         return task;
     }
@@ -38,16 +40,17 @@ public class TaskServiceTests
         mockRepo.Setup(r => r.IsTaskOwnedByStudent(task.Id, StudentId)).Returns(true);
 
         // Act
-        service.UpdateTaskForStudent(
-            StudentId,
-            task.Id,
-            "Homework updated",
-            "Updated desc",
-            task.StartTime,
-            task.EndTime,
-            null,
-            50
+        var updatedTask = new Task(
+            title: "Homework updated",
+            description: "Updated desc",
+            startTime: task.StartTime,
+            endTime: task.EndTime,
+            deadline: null
         );
+
+        updatedTask.UpdateProgress(50);
+
+        service.UpdateTaskForStudent(StudentId, task.Id, updatedTask);
 
         // Assert
         mockRepo.Verify(r => r.Update(task), Times.Once);
@@ -121,12 +124,13 @@ public class TaskServiceTests
             service.UpdateTaskForStudent(
                 StudentId,
                 task.Id,
-                "X",
-                "Y",
-                task.StartTime,
-                task.EndTime,
-                null,
-                20
+                new Task(
+                    title: "X",
+                    description: "Y",
+                    startTime: task.StartTime,
+                    endTime: task.EndTime,
+                    deadline: null
+                )
             )
         );
     }
