@@ -2,6 +2,20 @@
 {
     public class Task
     {
+        public int Id { get; private set; }
+
+        public string Title { get; private set; }
+        public string Description { get; private set; }
+
+        public DateTime? StartTime { get; private set; }
+        public DateTime? EndTime { get; private set; }
+        public DateTime? Deadline { get; private set; }
+
+        public int ProgressPercentage { get; private set; }
+        public bool IsCompleted { get; private set; }
+
+        public Category? Category { get; private set; }
+
         // Hydration constructor (repository)
         public Task(
             int id,
@@ -36,20 +50,6 @@
             ProgressPercentage = 0;
             IsCompleted = false;
         }
-
-        public int Id { get; private set; }
-
-        public string Title { get; private set; }
-        public string Description { get; private set; }
-
-        public DateTime? StartTime { get; private set; }
-        public DateTime? EndTime { get; private set; }
-        public DateTime? Deadline { get; private set; }
-
-        public int ProgressPercentage { get; private set; }
-        public bool IsCompleted { get; private set; }
-
-        public Category? Category { get; private set; }
 
 
         // A Task must have exactly ONE of:

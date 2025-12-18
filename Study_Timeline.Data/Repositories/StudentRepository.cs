@@ -59,7 +59,6 @@ namespace Study_Timeline.Data.Repositories
                 );
         }
 
-
         public void Add(Student student)
         {
             using var connection = _factory.CreateConnection();

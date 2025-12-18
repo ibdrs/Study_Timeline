@@ -2,6 +2,12 @@
 {
     public class Student
     {
+        public int Id { get; private set; }
+        public string Name { get; private set; } = string.Empty;
+        public string Password { get; private set; } = string.Empty;
+
+        public List<Task> Tasks { get; private set; } = new();
+
         // Hydration constructor (repository)
         public Student(int id, string name, string password)
         {
@@ -17,18 +23,13 @@
             SetPassword(password);
         }
 
-        public int Id { get; private set; }
-        public string Name { get; private set; } = string.Empty;
-        public string Password { get; private set; } = string.Empty;
-
-        public List<Task> Tasks { get; private set; } = new();
-
         // Domain behaviour
         private void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Name cannot be empty.");
 
+            //ToDo: validatie geen nummers in naam toevoegen
             Name = name;
         }
 

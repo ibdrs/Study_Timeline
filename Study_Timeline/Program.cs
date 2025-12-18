@@ -14,6 +14,12 @@ builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<TaskService>();
 builder.Services.AddScoped<StudentService>();
 
+builder.Services.AddScoped<IStudentAuthenticationService>(sp =>
+    sp.GetRequiredService<StudentService>());
+
+builder.Services.AddScoped<IStudentRegistrationService>(sp =>
+    sp.GetRequiredService<StudentService>());
+
 builder.Services.AddSingleton<DbConnectionFactory>();
 
 

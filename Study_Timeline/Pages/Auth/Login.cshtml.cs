@@ -1,17 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Study_Timeline.Logic.Services;
+using Study_Timeline.Logic.Interfaces;
 using Study_Timeline.Models;
 
 namespace Study_Timeline.View.Pages.Auth
 {
     public class LoginModel : PageModel
     {
-        private readonly StudentService _studentService;
+        private readonly IStudentAuthenticationService _studentAuthService;
 
-        public LoginModel(StudentService studentService)
+        public LoginModel(IStudentAuthenticationService studentAuthenticationService)
         {
-            _studentService = studentService;
+            _studentAuthService = studentAuthenticationService;
         }
 
         [BindProperty]
@@ -27,7 +27,7 @@ namespace Study_Timeline.View.Pages.Auth
                 return Page();
 
             // Lets validate the student
-            var student = _studentService.ValidateStudent(StudentLogin.UserName, StudentLogin.Password);
+            var student = _studentAuthService.ValidateStudent(StudentLogin.UserName, StudentLogin.Password);
 
             if (student == null)
             {
