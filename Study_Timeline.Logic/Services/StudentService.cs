@@ -34,6 +34,17 @@ namespace Study_Timeline.Logic.Services
             _taskRepo.Add(task, student.Id);
         }
 
+        public void RemoveTaskForStudent(int studentId, int taskId)
+        {
+            var student = _studentRepo.GetById(studentId)
+                ?? throw new InvalidOperationException("Student not found");
+            var task = _taskRepo.GetById(taskId)
+                ?? throw new InvalidOperationException("Task not found");
+
+            student.RemoveTask(task);
+            _taskRepo.Delete(taskId);
+        }
+
         // authentication logic
         public void RegisterStudent(Student student)
         {
