@@ -1,8 +1,8 @@
 ﻿using Moq;
-using Study_Timeline.Logic.Interfaces;
 using Study_Timeline.Logic.Services;
 using Study_Timeline.Logic.Domain;
 using Task = Study_Timeline.Logic.Domain.Task;
+using Study_Timeline.Logic.Interfaces.Data;
 
 public class TaskServiceTests
 {

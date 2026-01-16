@@ -20,7 +20,7 @@ namespace Study_Timeline.View.Pages.Tasks
         {
             var studentId = HttpContext.Session.GetInt32("StudentId");
             if (studentId == null)
-                return RedirectToPage("/Login");
+                return RedirectToPage("/Auth/Login");
 
             Tasks = _taskService.GetTasksForStudent(studentId.Value);
             return Page();
@@ -30,9 +30,9 @@ namespace Study_Timeline.View.Pages.Tasks
         {
             var studentId = HttpContext.Session.GetInt32("StudentId");
             if (studentId == null)
-                return RedirectToPage("/Login");
+                return RedirectToPage("/Auth/Login");
 
-            _taskService.DeleteTaskForStudent(studentId.Value, id);
+            _taskService.RemoveTaskForStudent(studentId.Value, id);
             return RedirectToPage();
         }
 
@@ -40,7 +40,7 @@ namespace Study_Timeline.View.Pages.Tasks
         {
             var studentId = HttpContext.Session.GetInt32("StudentId");
             if (studentId == null)
-                return RedirectToPage("/Login");
+                return RedirectToPage("/Auth/Login");
 
             _taskService.CompleteTaskForStudent(studentId.Value, id);
             return RedirectToPage();

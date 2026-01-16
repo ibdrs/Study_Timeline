@@ -1,12 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Study_Timeline.Logic.Domain;
+using Study_Timeline.Logic.Interfaces.Data;
 
 namespace Study_Timeline.Logic.Services
 {
-    internal class CategoryService
+    public class CategoryService
     {
+        private readonly ICategoryRepository _repo;
+
+        public CategoryService(ICategoryRepository repo)
+        {
+            _repo = repo;
+        }
+
+        public List<Category> GetCategoriesForStudent(int studentId)
+        {
+            return _repo.GetByStudentId(studentId);
+        }
+
+        public Dictionary<int, Category> GetCategoryMapForStudent(int studentId)
+        {
+            return _repo.GetMapByStudentId(studentId);
+        }
+        public void CreateCategoryForStudent(int studentId, string name, string description)
+        {
+            if (_repo.ExistsByName(studentId, name))
+                throw new InvalidOperationException("Category name must be unique.");
+
+            var category = new Category(id: 0, name: name, description: description);
+            _repo.Add(category, studentId);
+        }
+
+        public void DeleteCategoryForStudent(int studentId, int categoryId)
+        {
+            _repo.Delete(categoryId, studentId);
+        }
     }
 }

@@ -1,6 +1,9 @@
 using Study_Timeline.Logic.Services;
 using Study_Timeline.Logic.Interfaces;
+using Study_Timeline.Logic.Interfaces.Data;
 using Study_Timeline.Data.Repositories;
+using Study_Timeline.Logic.Progress;
+using Study_Timeline.Logic.Timeline;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,12 +14,17 @@ builder.Services.AddHttpContextAccessor();
 // Dependency Injection (Services)
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
 builder.Services.AddScoped<TaskService>();
 builder.Services.AddScoped<StudentService>();
+builder.Services.AddScoped<CategoryService>();
+
+builder.Services.AddScoped<ITimelineBuilder, WeeklyTimelineBuilder>();
+builder.Services.AddScoped<IProgressCalculator, WeeklyProgressCalculator>();
 
 builder.Services.AddScoped<IStudentAuthenticationService>(sp =>
     sp.GetRequiredService<StudentService>());
-
 builder.Services.AddScoped<IStudentRegistrationService>(sp =>
     sp.GetRequiredService<StudentService>());
 

@@ -1,4 +1,4 @@
-﻿using Study_Timeline.Logic.Interfaces;
+﻿using Study_Timeline.Logic.Interfaces.Data;
 using Task = Study_Timeline.Logic.Domain.Task;
 
 namespace Study_Timeline.Logic.Services
@@ -6,10 +6,12 @@ namespace Study_Timeline.Logic.Services
     public class TaskService
     {
         private readonly ITaskRepository _repo;
+        private readonly IStudentRepository _studentRepo;
 
-        public TaskService(ITaskRepository repo)
+        public TaskService(ITaskRepository repo, IStudentRepository studentRepo)
         {
             _repo = repo;
+            _studentRepo = studentRepo;
         }
 
         // Get all tasks
@@ -86,6 +88,26 @@ namespace Study_Timeline.Logic.Services
 
             task.MarkCompleted();
             _repo.Update(task);
+        }
+
+        public void AddTaskForStudent(int studentId, Task task)
+        {
+            var student = _studentRepo.GetById(studentId)
+                ?? throw new InvalidOperationException("Student not found");
+
+            student.AddTask(task);
+            _repo.Add(task, student.Id);
+        }
+
+        public void RemoveTaskForStudent(int studentId, int taskId)
+        {
+            var student = _studentRepo.GetById(studentId)
+                ?? throw new InvalidOperationException("Student not found");
+            var task = _repo.GetById(taskId)
+                ?? throw new InvalidOperationException("Task not found");
+
+            student.RemoveTask(task);
+            _repo.Delete(taskId);
         }
     }
 }

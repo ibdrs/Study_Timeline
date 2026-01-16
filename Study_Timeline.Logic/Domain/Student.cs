@@ -38,22 +38,6 @@
         }
 
         // Domain behaviour
-        private void SetName(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Name cannot be empty.");
-
-            Name = name;
-        }
-
-        private void SetPassword(string password)
-        {
-            if (string.IsNullOrWhiteSpace(password))
-                throw new ArgumentException("Password cannot be empty.");
-
-            Password = password;
-        }
-
         public Task AddTask(Task task)
         {
             if (task == null)

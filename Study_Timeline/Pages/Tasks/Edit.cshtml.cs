@@ -25,7 +25,7 @@ namespace Study_Timeline.View.Pages.Tasks
         {
             var studentId = HttpContext.Session.GetInt32("StudentId");
             if (studentId == null)
-                return RedirectToPage("/Login");
+                return RedirectToPage("/Auth/Login");
 
             var task = _taskService.GetTaskForStudent(id, studentId.Value);
             if (task == null)
@@ -87,7 +87,7 @@ namespace Study_Timeline.View.Pages.Tasks
 
             var studentId = HttpContext.Session.GetInt32("StudentId");
             if (studentId == null)
-                return RedirectToPage("/Login");
+                return RedirectToPage("/Auth/Login");
 
             var updatedTask = new Task(
                 EditTaskInputModel.Title,
@@ -108,7 +108,7 @@ namespace Study_Timeline.View.Pages.Tasks
         {
             var studentId = HttpContext.Session.GetInt32("StudentId");
             if (studentId == null)
-                return RedirectToPage("/Login");
+                return RedirectToPage("/Auth/Login");
 
             _taskService.CompleteTaskForStudent(studentId.Value, id);
 

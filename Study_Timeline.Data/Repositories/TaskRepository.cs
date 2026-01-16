@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Study_Timeline.Logic.Domain;
-using Study_Timeline.Logic.Interfaces;
+using Study_Timeline.Logic.Interfaces.Data;
 using Task = Study_Timeline.Logic.Domain.Task;
 
 namespace Study_Timeline.Data.Repositories
@@ -27,7 +27,7 @@ namespace Study_Timeline.Data.Repositories
             using var command = new SqlCommand(query, connection);
 
             command.Parameters.AddWithValue("@Title", task.Title);
-            command.Parameters.AddWithValue("@Description", task.Description);
+            command.Parameters.AddWithValue("@Description", (object?)task.Description ?? DBNull.Value);
             command.Parameters.AddWithValue("@StartDateTime", (object?)task.StartTime ?? DBNull.Value);
             command.Parameters.AddWithValue("@EndDateTime", (object?)task.EndTime ?? DBNull.Value);
             command.Parameters.AddWithValue("@Deadline", (object?)task.Deadline ?? DBNull.Value);
@@ -68,7 +68,7 @@ namespace Study_Timeline.Data.Repositories
 
             command.Parameters.AddWithValue("@Id", task.Id);
             command.Parameters.AddWithValue("@Title", task.Title);
-            command.Parameters.AddWithValue("@Description", task.Description);
+            command.Parameters.AddWithValue("@Description", (object?)task.Description ?? DBNull.Value);
             command.Parameters.AddWithValue("@StartDateTime", (object?)task.StartTime ?? DBNull.Value);
             command.Parameters.AddWithValue("@EndDateTime", (object?)task.EndTime ?? DBNull.Value);
             command.Parameters.AddWithValue("@Deadline", (object?)task.Deadline ?? DBNull.Value);

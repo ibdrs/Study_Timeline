@@ -1,10 +1,98 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Timeline";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome to the Study Timeline App!</h1>
-    <p></a>.</p>
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-0">Your Study Timeline</h1>
+        <div class="text-muted">Grouped per week • Sorted chronologically</div>
+    </div>
+    <a class="btn btn-primary" asp-page="/Tasks/Create">Add Task</a>
 </div>
+
+@if (Model.Timeline.Weeks.Count == 0)
+{
+    <div class="alert alert-info">No tasks yet. Add your first task to start building your timeline.</div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var week in Model.Timeline.Weeks)
+        {
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div>
+                                <div class="fw-semibold">
+                                    Week @week.IsoWeekNumber, @week.IsoWeekYear,
+                                    @week.WeekStart.ToString("dd MMM") - @week.WeekEnd.ToString("dd MMM")
+                                </div>
+                                <div class="text-muted" style="font-size: 0.9rem;">
+                                    Progress: @week.ProgressPercent%
+                                </div>
+                            </div>
+                            <div style="min-width: 220px;">
+                                <div class="progress" role="progressbar" aria-valuenow="@week.ProgressPercent" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="progress-bar" style="width:@week.ProgressPercent%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (week.Tasks.Count == 0)
+                        {
+                            <div class="text-muted">No tasks in this week.</div>
+                        }
+                        else
+                        {
+                            <div class="d-flex flex-column gap-2">
+                                @foreach (var t in week.Tasks.OrderBy(x => x.Anchor))
+                                {
+                                    var height = Math.Max(34, t.DurationMinutes / 10);
+                                    var borderClass = t.IsCompleted ? "border-success" : "border-secondary";
+                                    <div class="border rounded p-2 @borderClass" style="height:@(height)px; overflow:hidden;">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div class="fw-semibold">
+                                                @if (t.IsCompleted)
+                                                {
+                                                    <span class="text-success">✔</span>
+                                                }
+                                                @t.Title
+                                            </div>
+                                            <div class="text-muted" style="font-size: 0.85rem;">
+                                                @if (t.StartTime.HasValue && t.EndTime.HasValue)
+                                                {
+                                                    <span>@t.StartTime.Value.ToString("ddd HH:mm") - @t.EndTime.Value.ToString("HH:mm")</span>
+                                                }
+                                                else if (t.Deadline.HasValue)
+                                                {
+                                                    <span>Deadline: @t.Deadline.Value.ToString("ddd HH:mm")</span>
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex align-items-center justify-content-between mt-1" style="font-size: 0.85rem;">
+                                            <div class="text-muted text-truncate" style="max-width: 70%;">
+                                                @t.Description
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                @if (!string.IsNullOrWhiteSpace(t.CategoryName))
+                                                {
+                                                    <span class="badge bg-light text-dark border">@t.CategoryName</span>
+                                                }
+                                                <span class="badge bg-light text-dark border">@t.ProgressPercentage%</span>
+                                                <a class="btn btn-sm btn-outline-secondary" asp-page="/Tasks/Edit" asp-route-id="@t.Id">Edit</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

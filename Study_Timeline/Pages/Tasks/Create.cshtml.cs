@@ -7,14 +7,14 @@ namespace Study_Timeline.View.Pages.Tasks
 {
     public class CreateModel : PageModel
     {
-        private readonly StudentService _studentService;
+        private readonly TaskService _taskService;
 
         [BindProperty]
         public CreateTaskInputModel CreateTaskInputModel { get; set; } = new();
 
-        public CreateModel(StudentService studentService)
+        public CreateModel(TaskService taskService)
         {
-            _studentService = studentService;
+            _taskService = taskService;
         }
 
         private static DateTime TrimSeconds(DateTime dt) =>
@@ -67,7 +67,7 @@ namespace Study_Timeline.View.Pages.Tasks
                 return Page();
 
             if (HttpContext.Session.GetInt32("StudentId") == null)
-                return RedirectToPage("/Login");
+                return RedirectToPage("/Auth/Login");
 
             var studentId = HttpContext.Session.GetInt32("StudentId")!.Value;
 
@@ -79,7 +79,7 @@ namespace Study_Timeline.View.Pages.Tasks
                 CreateTaskInputModel.Deadline == null ? null : TrimSeconds(CreateTaskInputModel.Deadline.Value)
             );
 
-            _studentService.AddTaskForStudent(studentId, task);
+            _taskService.AddTaskForStudent(studentId, task);
 
             return RedirectToPage("Index");
         }

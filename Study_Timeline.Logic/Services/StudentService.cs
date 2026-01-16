@@ -1,5 +1,6 @@
 ﻿using Study_Timeline.Logic.Domain;
 using Study_Timeline.Logic.Interfaces;
+using Study_Timeline.Logic.Interfaces.Data;
 using Task = Study_Timeline.Logic.Domain.Task;
 
 namespace Study_Timeline.Logic.Services
@@ -23,26 +24,6 @@ namespace Study_Timeline.Logic.Services
                 throw new ArgumentException("Username cannot be empty.");
 
             return _studentRepo.GetByUser(username);
-        }
-
-        public void AddTaskForStudent(int studentId, Task task)
-        {
-            var student = _studentRepo.GetById(studentId)
-                ?? throw new InvalidOperationException("Student not found");
-
-            student.AddTask(task);
-            _taskRepo.Add(task, student.Id);
-        }
-
-        public void RemoveTaskForStudent(int studentId, int taskId)
-        {
-            var student = _studentRepo.GetById(studentId)
-                ?? throw new InvalidOperationException("Student not found");
-            var task = _taskRepo.GetById(taskId)
-                ?? throw new InvalidOperationException("Task not found");
-
-            student.RemoveTask(task);
-            _taskRepo.Delete(taskId);
         }
 
         // authentication logic

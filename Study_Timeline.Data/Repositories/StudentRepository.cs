@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Study_Timeline.Logic.Domain;
-using Study_Timeline.Logic.Interfaces;
+using Study_Timeline.Logic.Interfaces.Data;
 
 namespace Study_Timeline.Data.Repositories
 {
