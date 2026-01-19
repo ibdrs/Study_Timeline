@@ -133,5 +133,15 @@
             if (percent == 100)
                 MarkCompleted();
         }
+
+        public void AssignCategory(Category category)
+        {
+            Category = category ?? throw new ArgumentNullException(nameof(category));
+        }
+
+        public void ClearCategory()
+        {
+            Category = null;
+        }
     }
 }

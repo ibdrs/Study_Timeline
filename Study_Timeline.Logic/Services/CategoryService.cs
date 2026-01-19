@@ -1,4 +1,5 @@
 ﻿using Study_Timeline.Logic.Domain;
+using Study_Timeline.Logic.Exceptions;
 using Study_Timeline.Logic.Interfaces.Data;
 
 namespace Study_Timeline.Logic.Services
@@ -21,10 +22,14 @@ namespace Study_Timeline.Logic.Services
         {
             return _repo.GetMapByStudentId(studentId);
         }
+
         public void CreateCategoryForStudent(int studentId, string name, string description)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ValidationException("Category name is required.", field: "NewCategoryName");
+
             if (_repo.ExistsByName(studentId, name))
-                throw new InvalidOperationException("Category name must be unique.");
+                throw new ValidationException("Category name must be unique.", field: "NewCategoryName");
 
             var category = new Category(id: 0, name: name, description: description);
             _repo.Add(category, studentId);

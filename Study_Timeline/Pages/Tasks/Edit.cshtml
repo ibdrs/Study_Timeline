@@ -72,6 +72,41 @@
     </div>
 
     <div class="mb-3">
+    <label class="form-label">Category (optional)</label>
+    <select asp-for="EditTaskInputModel.SelectedCategoryId" class="form-select">
+        <option value="">-- None --</option>
+        @foreach (var c in Model.Categories)
+        {
+            <option value="@c.Id">@c.Name</option>
+        }
+    </select>
+    <span asp-validation-for="EditTaskInputModel.SelectedCategoryId" class="text-danger"></span>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="fw-semibold mb-2">Add new category</div>
+
+            <div class="mb-2">
+                <input asp-for="EditTaskInputModel.NewCategoryName" class="form-control" placeholder="Category name" />
+                <span asp-validation-for="EditTaskInputModel.NewCategoryName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-2">
+                <input asp-for="EditTaskInputModel.NewCategoryDescription" class="form-control" placeholder="Description (optional)" />
+            </div>
+
+            <button class="btn btn-outline-primary"
+                    type="submit"
+                    asp-page-handler="AddCategory"
+                    asp-route-id="@Model.EditTaskInputModel.Id">
+                Add category
+            </button>
+        </div>
+    </div>
+
+
+    <div class="mb-3">
         <label asp-for="EditTaskInputModel.ProgressPercentage" class="form-label">
             Progress (%)
         </label>

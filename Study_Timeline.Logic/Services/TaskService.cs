@@ -1,4 +1,5 @@
-﻿using Study_Timeline.Logic.Interfaces.Data;
+﻿using Study_Timeline.Logic.Exceptions;
+using Study_Timeline.Logic.Interfaces.Data;
 using Task = Study_Timeline.Logic.Domain.Task;
 
 namespace Study_Timeline.Logic.Services
@@ -14,97 +15,101 @@ namespace Study_Timeline.Logic.Services
             _studentRepo = studentRepo;
         }
 
-        // Get all tasks
-        public List<Task> GetAllTasks()
-        {
-            return _repo.GetAll();
-        }
-
-        // Get a task by Id
-        public Task? GetTaskById(int id)
-        {
-            return _repo.GetById(id);
-        }
-
         public List<Task> GetTasksForStudent(int studentId)
         {
-            return _repo.GetByStudentId(studentId);
+            var student = _studentRepo.GetById(studentId)
+                ?? throw new NotFoundException("Student", studentId);
+
+            return _repo.GetByStudentId(student.Id);
         }
 
-        public Task? GetTaskForStudent(int taskId, int studentId)
+        public Task GetTaskForStudent(int taskId, int studentId)
         {
-            var task = _repo.GetById(taskId);
-            if (task == null)
-                return null;
+            var task = _repo.GetById(taskId)
+                ?? throw new NotFoundException("Task", taskId);
 
             if (!_repo.IsTaskOwnedByStudent(taskId, studentId))
-                return null;
+                throw new ForbiddenException("This task does not belong to you.");
 
             return task;
         }
 
-        // Update an existing task
         public void UpdateTaskForStudent(int studentId, int taskId, Task updatedTask)
         {
             var task = _repo.GetById(taskId)
-                ?? throw new KeyNotFoundException("Task not found.");
+                ?? throw new NotFoundException("Task", taskId);
 
             if (!_repo.IsTaskOwnedByStudent(taskId, studentId))
-                throw new UnauthorizedAccessException();
+                throw new ForbiddenException("You are not allowed to edit this task.");
 
-            task.UpdateDetails(
-                updatedTask.Title,
-                updatedTask.Description,
-                updatedTask.StartTime,
-                updatedTask.EndTime,
-                updatedTask.Deadline
-            );
+            try
+            {
+                task.UpdateDetails(
+                    updatedTask.Title,
+                    updatedTask.Description,
+                    updatedTask.StartTime,
+                    updatedTask.EndTime,
+                    updatedTask.Deadline
+                );
 
-            task.UpdateProgress(updatedTask.ProgressPercentage);
+                task.UpdateProgress(updatedTask.ProgressPercentage);
 
-            _repo.Update(task);
-        }
+                if (updatedTask.Category == null) task.ClearCategory();
+                else task.AssignCategory(updatedTask.Category);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ValidationException(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new ValidationException(ex.Message);
+            }
 
-        // Delete a task
-        public void DeleteTaskForStudent(int studentId, int taskId)
-        {
-            var task = _repo.GetById(taskId)
-                ?? throw new KeyNotFoundException("Task not found.");
 
-            if (!_repo.IsTaskOwnedByStudent(taskId, studentId))
-                throw new UnauthorizedAccessException();
-
-            _repo.Delete(taskId);
-        }
-
-        // Mark task as completed
-        public void CompleteTaskForStudent(int studentId, int taskId)
-        {
-            var task = _repo.GetById(taskId)
-                ?? throw new KeyNotFoundException("Task not found.");
-
-            if (!_repo.IsTaskOwnedByStudent(taskId, studentId))
-                throw new UnauthorizedAccessException();
-
-            task.MarkCompleted();
             _repo.Update(task);
         }
 
         public void AddTaskForStudent(int studentId, Task task)
         {
             var student = _studentRepo.GetById(studentId)
-                ?? throw new InvalidOperationException("Student not found");
+                ?? throw new NotFoundException("Student", studentId);
 
-            student.AddTask(task);
+            try
+            {
+                student.AddTask(task);
+            }
+            catch (ArgumentNullException ex)
+            {
+                throw new ValidationException(ex.Message);
+            }
+
             _repo.Add(task, student.Id);
         }
+
+        public void CompleteTaskForStudent(int studentId, int taskId)
+        {
+            var task = _repo.GetById(taskId)
+                ?? throw new NotFoundException("Task", taskId);
+
+            if (!_repo.IsTaskOwnedByStudent(taskId, studentId))
+                throw new ForbiddenException("You are not allowed to complete this task.");
+
+            task.MarkCompleted();
+            _repo.Update(task);
+        }
+
 
         public void RemoveTaskForStudent(int studentId, int taskId)
         {
             var student = _studentRepo.GetById(studentId)
-                ?? throw new InvalidOperationException("Student not found");
+                ?? throw new NotFoundException("Student", studentId);
+
             var task = _repo.GetById(taskId)
-                ?? throw new InvalidOperationException("Task not found");
+                ?? throw new NotFoundException("Task", taskId);
+
+            if (!_repo.IsTaskOwnedByStudent(taskId, studentId))
+                throw new ForbiddenException("You are not allowed to delete this task.");
 
             student.RemoveTask(task);
             _repo.Delete(taskId);

@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Study_Timeline.Logic.Domain;
+using Study_Timeline.Logic.Exceptions;
 using Study_Timeline.Logic.Services;
 using Study_Timeline.Models;
 using Task = Study_Timeline.Logic.Domain.Task;
@@ -9,6 +11,9 @@ namespace Study_Timeline.View.Pages.Tasks
     public class EditModel : PageModel
     {
         private readonly TaskService _taskService;
+        private readonly CategoryService _categoryService;
+
+        public List<Category> Categories { get; private set; } = new();
 
         private static DateTime TrimSeconds(DateTime dt) =>
             new(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, 0);
@@ -16,38 +21,120 @@ namespace Study_Timeline.View.Pages.Tasks
         [BindProperty]
         public EditTaskInputModel EditTaskInputModel { get; set; } = new();
 
-        public EditModel(TaskService taskService)
+        public EditModel(TaskService taskService, CategoryService categoryService)
         {
             _taskService = taskService;
+            _categoryService = categoryService;
+        }
+
+        private int? GetStudentIdOrNull()
+        {
+            return HttpContext.Session.GetInt32("StudentId");
+        }
+
+        private void LoadCategories(int studentId)
+        {
+            Categories = _categoryService.GetCategoriesForStudent(studentId);
         }
 
         public IActionResult OnGet(int id)
         {
-            var studentId = HttpContext.Session.GetInt32("StudentId");
+            var studentId = GetStudentIdOrNull();
             if (studentId == null)
                 return RedirectToPage("/Auth/Login");
 
-            var task = _taskService.GetTaskForStudent(id, studentId.Value);
-            if (task == null)
-                return NotFound();
+            LoadCategories(studentId.Value);
 
-            EditTaskInputModel = new EditTaskInputModel
+            try
             {
-                Id = task.Id,
-                Title = task.Title,
-                Description = task.Description,
-                IsDeadline = task.Deadline != null,
-                Deadline = task.Deadline,
-                StartTime = task.StartTime,
-                EndTime = task.EndTime,
-                ProgressPercentage = task.ProgressPercentage
-            };
+                var task = _taskService.GetTaskForStudent(id, studentId.Value);
+
+                EditTaskInputModel = new EditTaskInputModel
+                {
+                    Id = task.Id,
+                    Title = task.Title,
+                    Description = task.Description,
+                    IsDeadline = task.Deadline != null,
+                    Deadline = task.Deadline,
+                    StartTime = task.StartTime,
+                    EndTime = task.EndTime,
+                    ProgressPercentage = task.ProgressPercentage,
+                    SelectedCategoryId = task.Category?.Id
+                };
+
+                return Page();
+            }
+            catch (ForbiddenException ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToPage("Index");
+            }
+            catch (NotFoundException ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToPage("Index");
+            }
+        }
+
+        public IActionResult OnPostAddCategory(int id)
+        {
+            var studentId = GetStudentIdOrNull();
+            if (studentId == null)
+                return RedirectToPage("/Auth/Login");
+
+            LoadCategories(studentId.Value);
+
+            var name = EditTaskInputModel.NewCategoryName?.Trim();
+            var desc = EditTaskInputModel.NewCategoryDescription ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                ModelState.AddModelError(nameof(EditTaskInputModel.NewCategoryName), "Category name is required.");
+                return Page();
+            }
+
+            try
+            {
+                _categoryService.CreateCategoryForStudent(studentId.Value, name, desc);
+            }
+            catch (ValidationException ex)
+            {
+                if (!string.IsNullOrWhiteSpace(ex.Field))
+                    ModelState.AddModelError($"EditTaskInputModel.{ex.Field}", ex.Message);
+                else
+                    ModelState.AddModelError(string.Empty, ex.Message);
+
+                return Page();
+            }
+            catch (ForbiddenException ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToPage("Index");
+            }
+            catch (NotFoundException ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToPage("Index");
+            }
+
+            LoadCategories(studentId.Value);
+            var created = Categories.FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            EditTaskInputModel.SelectedCategoryId = created?.Id;
+
+            EditTaskInputModel.NewCategoryName = "";
+            EditTaskInputModel.NewCategoryDescription = "";
 
             return Page();
         }
 
         public IActionResult OnPost(int id)
         {
+            var studentId = GetStudentIdOrNull();
+            if (studentId == null)
+                return RedirectToPage("/Auth/Login");
+
+            LoadCategories(studentId.Value);
+
             // UI Validation for time constraints
             if (EditTaskInputModel.IsDeadline)
             {
@@ -55,39 +142,27 @@ namespace Study_Timeline.View.Pages.Tasks
                 EditTaskInputModel.EndTime = null;
 
                 if (EditTaskInputModel.Deadline == null)
-                {
-                    ModelState.AddModelError(
-                        nameof(EditTaskInputModel.Deadline),
-                        "Deadline is required."
-                    );
-                }
+                    ModelState.AddModelError(nameof(EditTaskInputModel.Deadline), "Deadline is required.");
             }
             else
             {
                 EditTaskInputModel.Deadline = null;
 
                 if (EditTaskInputModel.StartTime == null || EditTaskInputModel.EndTime == null)
-                {
-                    ModelState.AddModelError(
-                        string.Empty,
-                        "Start time and end time are required."
-                    );
-                }
+                    ModelState.AddModelError(string.Empty, "Start time and end time are required.");
                 else if (EditTaskInputModel.EndTime <= EditTaskInputModel.StartTime)
-                {
-                    ModelState.AddModelError(
-                        nameof(EditTaskInputModel.EndTime),
-                        "End time must be after start time."
-                    );
-                }
+                    ModelState.AddModelError(nameof(EditTaskInputModel.EndTime), "End time must be after start time.");
+            }
+
+            // Validate category selection belongs to student
+            if (EditTaskInputModel.SelectedCategoryId.HasValue &&
+                !Categories.Any(c => c.Id == EditTaskInputModel.SelectedCategoryId.Value))
+            {
+                ModelState.AddModelError(nameof(EditTaskInputModel.SelectedCategoryId), "Invalid category selection.");
             }
 
             if (!ModelState.IsValid)
                 return Page();
-
-            var studentId = HttpContext.Session.GetInt32("StudentId");
-            if (studentId == null)
-                return RedirectToPage("/Auth/Login");
 
             var updatedTask = new Task(
                 EditTaskInputModel.Title,
@@ -99,18 +174,54 @@ namespace Study_Timeline.View.Pages.Tasks
 
             updatedTask.UpdateProgress(EditTaskInputModel.ProgressPercentage);
 
-            _taskService.UpdateTaskForStudent(studentId.Value, id, updatedTask);
+            if (EditTaskInputModel.SelectedCategoryId.HasValue)
+                updatedTask.AssignCategory(new Category(EditTaskInputModel.SelectedCategoryId.Value));
+            else
+                updatedTask.ClearCategory();
+
+            try
+            {
+                _taskService.UpdateTaskForStudent(studentId.Value, id, updatedTask);
+            }
+            catch (ValidationException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return Page();
+            }
+            catch (ForbiddenException ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToPage("Index");
+            }
+            catch (NotFoundException ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToPage("Index");
+            }
 
             return RedirectToPage("Index");
         }
 
         public IActionResult OnPostComplete(int id)
         {
-            var studentId = HttpContext.Session.GetInt32("StudentId");
+            var studentId = GetStudentIdOrNull();
             if (studentId == null)
                 return RedirectToPage("/Auth/Login");
 
-            _taskService.CompleteTaskForStudent(studentId.Value, id);
+            try
+            {
+                _taskService.CompleteTaskForStudent(studentId.Value, id);
+            }
+            catch (ForbiddenException ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToPage("Index");
+            }
+            catch (NotFoundException ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToPage("Index");
+            }
 
             return RedirectToPage("Index");
         }

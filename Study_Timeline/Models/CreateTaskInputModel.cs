@@ -4,6 +4,10 @@
     public string? Description { get; set; } = string.Empty;
 
     public bool IsDeadline { get; set; }
+    public int? SelectedCategoryId { get; set; }
+
+    public string? NewCategoryName { get; set; }
+    public string? NewCategoryDescription { get; set; }
 
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }

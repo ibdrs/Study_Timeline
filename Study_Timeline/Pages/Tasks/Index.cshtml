@@ -12,6 +12,7 @@
             <th>Progress</th>
             <th>Start</th>
             <th>End</th>
+            <th>Category</th>
             <th>Completed</th>
             <th></th>
         </tr>
@@ -46,6 +47,8 @@
                         @(t.EndTime?.ToString("g") ?? "-")
                     }
                 </td>
+
+                <td>@Model.ResolveCategoryName(t)</td>
 
                 <td>@(t.IsCompleted ? "Yes" : "No")</td>
 

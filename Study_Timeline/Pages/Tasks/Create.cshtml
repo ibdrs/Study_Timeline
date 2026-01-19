@@ -3,7 +3,10 @@
 
 <h2>Add Task</h2>
 
+<!-- TASK FORM -->
 <form method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
     <div class="mb-3">
         <label asp-for="CreateTaskInputModel.Title" class="form-label"></label>
         <input asp-for="CreateTaskInputModel.Title" class="form-control" />
@@ -63,8 +66,46 @@
         </div>
     </div>
 
-    <button class="btn btn-primary">Create</button>
+    <div class="mb-3">
+        <label class="form-label">Category (optional)</label>
+        <select asp-for="CreateTaskInputModel.SelectedCategoryId" class="form-select">
+            <option value="">-- None --</option>
+            @foreach (var c in Model.Categories)
+            {
+                <option value="@c.Id">@c.Name</option>
+            }
+        </select>
+        <span asp-validation-for="CreateTaskInputModel.SelectedCategoryId" class="text-danger"></span>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Create</button>
     <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+<!-- CATEGORY FORM (SEPARATE POST) -->
+<form method="post" asp-page-handler="AddCategory" class="mt-3">
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="fw-semibold mb-2">Add new category</div>
+
+            <div class="mb-2">
+                <input asp-for="CreateTaskInputModel.NewCategoryName"
+                       class="form-control"
+                       placeholder="Category name" />
+                <span asp-validation-for="CreateTaskInputModel.NewCategoryName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-2">
+                <input asp-for="CreateTaskInputModel.NewCategoryDescription"
+                       class="form-control"
+                       placeholder="Description (optional)" />
+            </div>
+
+            <button class="btn btn-outline-primary" type="submit">
+                Add category
+            </button>
+        </div>
+    </div>
 </form>
 
 @section Scripts {
@@ -73,8 +114,8 @@
     <script>
         function toggleTimeInputs() {
             const isDeadline =
-            document.querySelector('input[name="CreateTaskInputModel.IsDeadline"]:checked')
-                ?.value === "true";
+                    document.querySelector('input[name="CreateTaskInputModel.IsDeadline"]:checked')
+                        ?.value === "true";
 
             document.getElementById("deadlineBlock").style.display =
                 isDeadline ? "block" : "none";
